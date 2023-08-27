@@ -11,7 +11,4 @@ if __name__ == '__main__':
         if file.endswith('.py'):
             bot.load_extension(f'games.{file.split(".")[0]}')
 
-bot.run(open('token.txt').read())
-# Press the green button in the gutter to run the script.
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+bot.run(open('token.txt',encoding="utf8").read())
