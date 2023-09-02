@@ -26,7 +26,7 @@ class GameStateManager:
     # Time until the next public game starts.
     public_game_timer: datetime.datetime
     # Names of the Public Games currently available
-    public_game_list: dict[str, PublicGame]
+    public_game_list: dict[str, typing.Callable]
     # Names of the Private Games currently available.
     private_game_list: dict[str, PrivateGame]
     private_game_channel: disnake.TextChannel
