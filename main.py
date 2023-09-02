@@ -37,6 +37,8 @@ class GameStateManager:
         self.private_game_channel = typing.cast(disnake.TextChannel, _private)
 
         for file in os.listdir('public_games'):
+            if not file.endswith(".py"):
+                continue
             name = file.strip(".py")
             module = importlib.import_module(f'public_games/{name}')
             try:
