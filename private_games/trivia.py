@@ -31,7 +31,7 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, optional: st
 
     player_score = 0
 
-    #await asyncio.sleep(10)
+    await asyncio.sleep(10)
 
     questions = random.sample(sorted(undertale_trivia_questions_and_answers), k=10)
 
