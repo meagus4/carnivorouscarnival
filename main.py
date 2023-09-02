@@ -1,7 +1,11 @@
 import datetime
 import importlib
 import os
+import sys
+import time
 import typing
+import random
+
 from carnival_types import *
 import disnake
 from disnake.ext.commands import Bot
@@ -83,6 +87,11 @@ class GameStateManager:
             optional_argument: str | None = None):
         # Ugliest bodge I've ever written, please fix
         self = typing.cast(GameStateManager, gsm)
+
+        game_uid = hash(f"{inter.author.id}{game_name}{time.time()}{random.randint(0, 1000000)}")
+        game_uid += sys.maxsize + 1
+        print("gameuid", game_uid)
+
         if inter.channel_id != self.private_game_channel.id:
             return await inter.send(f"You can only play games in {self.private_game_channel.mention}.", ephemeral=True)
 
@@ -95,12 +104,11 @@ class GameStateManager:
         await pthread.send(f"Starting {game_name}... {inter.author.mention}")
         await inter.send(f"Check {pthread.mention}", ephemeral=True)
         game = self.private_game_list[game_name]
-        await game(pthread, typing.cast(disnake.Member, inter.author), optional_argument)
+        await game(pthread, typing.cast(disnake.Member, inter.author), optional_argument, bot, game_uid)
 
     # @bot.slash_command(name="load")
     # async def load_game(self, game_name: str, game_type: str):
     #    return ""
-
 
 if __name__ == '__main__':
     bot.run(open('token.txt', encoding="utf8").read())
