@@ -105,12 +105,14 @@ class GameStateManager:
         # Ugliest bodge I've ever written, please fix
         self = typing.cast(GameStateManager, gsm)
 
-        game_uid = hash(
-            f"{inter.author.id}{game_name}{time.time()}{random.randint(0, 1000000)}")
-        game_uid += sys.maxsize + 1
-        print("gameuid", game_uid)
+        # I _would_ split out the isinstance checks, but pylance doesn't support narrowing like that :/
+        in_thread = isinstance(inter.channel, disnake.Thread)
 
-        if inter.channel_id != self.private_game_channel.id:
+        parent_channel_id: int = (inter.channel.parent_id
+                                  if isinstance(inter.channel, disnake.Thread)
+                                  else inter.channel_id)
+
+        if parent_channel_id != self.private_game_channel.id:
             return await inter.send(f"You can only play games in {self.private_game_channel.mention}.", ephemeral=True)
 
         if not game_name or game_name not in self.private_game_list:
@@ -118,9 +120,19 @@ class GameStateManager:
             buf += "\n".join(self.private_game_list.keys())
             return await inter.send(buf, ephemeral=True)
 
-        pthread = await self.private_game_channel.create_thread(name=game_name, type=disnake.ChannelType.private_thread)
-        await pthread.send(f"Starting {game_name}... {inter.author.mention}")
-        await inter.send(f"Check {pthread.mention}", ephemeral=True)
+        game_uid = hash(
+            f"{inter.author.id}{game_name}{time.time()}{random.randint(0, 1000000)}")
+        game_uid += sys.maxsize + 1
+        print("gameuid", game_uid)
+
+        pthread = inter.channel if isinstance(inter.channel, disnake.Thread) else await self.private_game_channel.create_thread(name=game_name, type=disnake.ChannelType.private_thread)
+
+        if in_thread:
+            await inter.send(f"Starting {game_name}...")
+        else:
+            await pthread.send(f"Starting {game_name}... {inter.author.mention}")
+            await inter.send(f"Check {pthread.mention}", ephemeral=True)
+
         game = self.private_game_list[game_name]
         await game(pthread, typing.cast(disnake.Member, inter.author), optional_argument, bot, str(game_uid))
 
