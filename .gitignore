@@ -1,4 +1,6 @@
 /token.txt
+config.json
 *.pyc
 __pycache__
 carnival.db
+.venv/

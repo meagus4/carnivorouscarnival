@@ -6,20 +6,26 @@ import time
 import typing
 import random
 
+from config import load_config
 from carnival_types import *
 import disnake
-from disnake.ext.commands import Bot
+from disnake.ext.commands import Bot, when_mentioned
 import disnake.ext.tasks as tasks
 import random
 
-bot = Bot(command_prefix='.', intents=disnake.Intents().all())
+intents: disnake.Intents = disnake.Intents(
+    guilds=True,
+)
+
+bot = Bot(command_prefix=when_mentioned, intents=intents)
 gsm = None
+config = load_config()
 
 
 @bot.event
 async def on_ready():
-    _public = await bot.fetch_channel(1147388785269669908)
-    _private = await bot.fetch_channel(1147388437914189844)
+    _public = await bot.fetch_channel(config['public_channel'])
+    _private = await bot.fetch_channel(config['private_channel'])
     global gsm
     gsm = GameStateManager(_public, _private)
     gsm.start_timed_new_public_game.start()
@@ -71,11 +77,11 @@ class GameStateManager:
         game = self.public_game_list[game_name]
         await game(target_channel, optional_argument)
 
-    @bot.slash_command(name="play_public",permissions=disnake.Permissions(manage_messages=True))
+    @bot.slash_command(name="play_public", permissions=disnake.Permissions(manage_messages=True))
     async def start_new_public_game(self, inter: disnake.ApplicationCommandInteraction | None, game_name: str | None, optional_argument: str | None):
         await self._start_new_public_game(game_name, optional_argument)
 
-    @tasks.loop(minutes=30)
+    @tasks.loop(minutes=config['public_game_interval'])
     async def start_timed_new_public_game(self):
         await self._start_new_public_game()
 
@@ -88,7 +94,8 @@ class GameStateManager:
         # Ugliest bodge I've ever written, please fix
         self = typing.cast(GameStateManager, gsm)
 
-        game_uid = hash(f"{inter.author.id}{game_name}{time.time()}{random.randint(0, 1000000)}")
+        game_uid = hash(
+            f"{inter.author.id}{game_name}{time.time()}{random.randint(0, 1000000)}")
         game_uid += sys.maxsize + 1
         print("gameuid", game_uid)
 
@@ -104,11 +111,12 @@ class GameStateManager:
         await pthread.send(f"Starting {game_name}... {inter.author.mention}")
         await inter.send(f"Check {pthread.mention}", ephemeral=True)
         game = self.private_game_list[game_name]
-        await game(pthread, typing.cast(disnake.Member, inter.author), optional_argument, bot, game_uid)
+        await game(pthread, typing.cast(disnake.Member, inter.author), optional_argument, bot, str(game_uid))
 
     # @bot.slash_command(name="load")
     # async def load_game(self, game_name: str, game_type: str):
     #    return ""
+
 
 if __name__ == '__main__':
     bot.run(open('token.txt', encoding="utf8").read())
