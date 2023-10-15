@@ -81,7 +81,6 @@ class GameStateManager:
         await game(target_channel, optional_argument)
 
     @bot.slash_command(name="play_public", permissions=disnake.Permissions(manage_messages=True))
-
     async def start_new_public_game(
             self,
             inter: disnake.ApplicationCommandInteraction | None,
@@ -136,11 +135,6 @@ class GameStateManager:
             buf = "Please select a valid game. Games include:\n"
             buf += "\n".join(self.private_game_list.keys())
             return await inter.send(buf, ephemeral=True)
-
-        game_uid = hash(
-            f"{inter.author.id}{game_name}{time.time()}{random.randint(0, 1000000)}")
-        game_uid += sys.maxsize + 1
-        print("gameuid", game_uid)
 
         pthread = inter.channel if isinstance(inter.channel, disnake.Thread) else await self.private_game_channel.create_thread(name=game_name, type=disnake.ChannelType.private_thread)
 

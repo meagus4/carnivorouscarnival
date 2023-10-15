@@ -4,6 +4,7 @@ import os
 import disnake
 import idtools
 import datetime
+import time
 
 jwt = idtools.Token()
 
@@ -40,6 +41,7 @@ class Database:
         self.db.execute("INSERT INTO prize_wins (user, game, prize) SELECT ?, ?, prizes.id from prizes order by random() limit 1", (user.id, game))
         self.db.commit()
     def create_web_game_session(self, user: disnake.Member, game: str, additional_context: dict = {}) -> str:
+        additional_context["ts"] = datetime.datetime.now().timestamp()
         token = jwt.make_token(user, additional_context)
         cur = self.db.execute("INSERT INTO web_game_sessions (user, game, status, session_token) VALUES (?, ?, 0, ?)", (user.id, game, token))
         self.db.commit()
