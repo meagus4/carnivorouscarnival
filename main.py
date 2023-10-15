@@ -5,8 +5,14 @@ import sys
 import time
 import typing
 import random
-
 from config import load_config
+import fastapi
+from fastapi import responses
+import asyncio
+import database
+db = database.Database()
+import idtools
+tokentools = idtools.Token()
 from carnival_types import *
 from disnake.ext.commands import Bot, when_mentioned, option_enum
 import disnake.ext.tasks as tasks
@@ -21,6 +27,12 @@ intents: disnake.Intents = disnake.Intents(
 bot = Bot(command_prefix=when_mentioned, intents=intents)
 gsm = None
 config = load_config()
+
+docs = True
+if docs:
+    web = fastapi.FastAPI()
+else:
+    web = fastapi.FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 
 
 @bot.event
@@ -69,6 +81,7 @@ class GameStateManager:
         await game(target_channel, optional_argument)
 
     @bot.slash_command(name="play_public", permissions=disnake.Permissions(manage_messages=True))
+
     async def start_new_public_game(
             self,
             inter: disnake.ApplicationCommandInteraction | None,
@@ -111,6 +124,10 @@ class GameStateManager:
         parent_channel_id: int = (inter.channel.parent_id
                                   if isinstance(inter.channel, disnake.Thread)
                                   else inter.channel_id)
+        game_uid = hash(
+            f"{inter.author.id}{game_name}{time.time()}{random.randint(0, 1000000)}")
+        game_uid += sys.maxsize + 1
+        print("gameuid", game_uid)
 
         if parent_channel_id != self.private_game_channel.id:
             return await inter.send(f"You can only play games in {self.private_game_channel.mention}.", ephemeral=True)
@@ -134,12 +151,47 @@ class GameStateManager:
             await inter.send(f"Check {pthread.mention}", ephemeral=True)
 
         game = self.private_game_list[game_name]
-        await game(pthread, typing.cast(disnake.Member, inter.author), optional_argument, bot, str(game_uid))
+        await game(pthread, typing.cast(disnake.Member, inter.author), bot, str(game_uid), optional_argument)
 
-    # @bot.slash_command(name="load")
-    # async def load_game(self, game_name: str, game_type: str):
-    #    return ""
+
+@web.get("/api/consume_session")
+async def consume_session(session: str):
+    """
+    Discord's play game tokens are single-use. Use this endpoint to validate and burn a token.
+    """
+    if not tokentools.decrypt_token(session):
+        return responses.JSONResponse({"valid": False, "reason": "Malformed/foreign session token."}, status_code=400)
+    valid = db.play_web_game_session(session)
+    return responses.JSONResponse({"valid": valid}, status_code=200 if valid else 400)
+
+@web.get("/api/submit_session")
+async def submit_session(session: str, game_name: str, score: str):
+    """
+    Submit a completed game using your session token. Games can be submitted *once*.
+    """
+    print("session: ", session, "\ngame_name: ", game_name, "\nscore: ", score)
+    #TODO FIX
+    return {"submitted": True}
 
 
 if __name__ == '__main__':
+    print("CarniverousCarnival: THIS INSTANCE IS NOT RUNNING THE API CORRECTLY!")
+    print("PLEASE START THE BOT BY LOADING UVICORN")
+    print("python -m uvicorn main:web")
     bot.run(open('token.txt', encoding="utf8").read())
+else:
+    print("CarniverousCarnival: Running as a dependency, likely from Uvicorn.")
+    print("If you're doing web debug I'd encourage you to disable Discord")
+    print("-Prevents burning your tokens")
+
+
+@web.on_event("startup")
+def api_startup():
+    '''Called by FastAPI to handle startup tasks, including starting Discord.'''
+    use_discord = True
+    print("Webserver up.")
+    if use_discord:
+        print("Starting Discord...")
+        asyncio.create_task(
+            bot.start(open('token.txt', encoding="utf8").read()))
+        print(f"Bot up - {bot.user}")

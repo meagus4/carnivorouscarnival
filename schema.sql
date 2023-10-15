@@ -5,6 +5,17 @@ CREATE TABLE ticket_wins (
   ticket_change INTEGER NOT NULL
 );
 
+CREATE TABLE web_game_sessions (
+  session_token TEXT NOT NULL UNIQUE, --jwt
+  user TEXT NOT NULL,
+  game TEXT NOT NULL,
+  points INT,
+  status INT NOT NULL, -- 0 = not started, 1 = started, 2 = finished
+  time_issued datetime not null default CURRENT_TIMESTAMP,
+  time_played datetime,
+  time_finished datetime
+);
+
 CREATE TABLE prize_wins (
   user TEXT NOT NULL,
   game TEXT NOT NULL,

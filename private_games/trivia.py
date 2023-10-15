@@ -4,14 +4,15 @@ import time
 
 import disnake
 import disnake.ext.commands
+import database
+db = database.Database()
 
 
 def __init__():
     return
 
 
-async def play_game(thread: disnake.Thread, member: disnake.Member, optional: str | None = None,
-                    bot: disnake.ext.commands.Bot | None = None, uuid: str | None = None):
+async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake.ext.commands.Bot, uid: str, optional: str | None = None):
     # return await thread.send("Embed here!")
 
     answered = False
@@ -20,7 +21,7 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, optional: st
     @bot.listen("on_button_click")
     async def on_button_click(inter: disnake.MessageInteraction):
         nonlocal player_score, answered
-        if inter.component.custom_id.startswith(str(uuid)) and answered == False:
+        if inter.component.custom_id.startswith(uid) and answered == False:
             answered = True
             data = inter.component.custom_id.split("_")
             q = data[1]
@@ -77,7 +78,7 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, optional: st
         buttons = []
         for answer in answers:
             buttons.append(disnake.ui.Button(label=answer, style=disnake.ButtonStyle.secondary,
-                                             custom_id=f"{uuid}_{q}_{num_to_iterate}"))
+                                             custom_id=f"{uid}_{q}_{num_to_iterate}"))
             num_to_iterate += 1
         await message.edit(embed=embed, components=buttons)
 
@@ -87,6 +88,7 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, optional: st
 
     embed.title = "Congratulations, Human! I, Mettaton, have won!"
     embed.description = f"However, as a reward for getting {player_score}/{len(questions)} of my questions correct, I'm awarding you with {player_score * 100} Tickets!"
-    message.edit(embed=embed, components=[])
+    await message.edit(embed=embed, components=[])
 
+    db.award_tickets(player_score*100, member, "Trivia")
     # TODO: Make this give player_score*100 Tickets. Meagus.
