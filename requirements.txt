@@ -1,1 +1,4 @@
-disnake
+disnake == 2.9.0
+fastapi == 0.103.1
+uvicorn == 0.23.2
+python-jose[cryptography] = 3.3.0
