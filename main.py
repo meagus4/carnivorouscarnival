@@ -78,7 +78,7 @@ class GameStateManager:
             game_name = random.choice(list(self.public_game_list.keys()))
             game_name = typing.cast(str, game_name)
         game = self.public_game_list[game_name]
-        await game(target_channel, optional_argument)
+        await game(target_channel, bot, optional_argument)
 
     @bot.slash_command(name="play_public", permissions=disnake.Permissions(manage_messages=True))
     async def start_new_public_game(
