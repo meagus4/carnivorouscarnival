@@ -42,14 +42,36 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
         "What's the prize for answering correctly?": ["Tickets", "Money", "Mercy", "New Car"],
         "What's the king's full name?": ["Asgore Dreemurr", "Lord Fluffybuns", "Fuzzy Pushover", "King Charles III"],
         "Would you smooch a ghost?": ["Heck Yeah", "Heck Yeah", "Heck Yeah", "Heck Yeah"],
-        "How many letters are in the name Mettaton?": ["8", "6", "11", "10"],
+        "How many letters are in the name Mettaton?": ["8", "9", "11", "10"],
+        "How many letters are in the name Metttaton?": ["9", "8", "11", "10"],
         "Who does Dr. Alphys have a crush on?": ["Undyne", "Asgore", "You!", "Don't Know"],
-        "What's the name of the underground city in Undertale?": ["Snowdin", "Waterfall", "Hotland", "New Home"],
-        "What's the name of the skeleton brothers in Undertale?": ["Sans and Papyrus", "Sans and Gaster",
-                                                                   "Papyrus and Gaster", "Sans and Flowey"],
-        "What's the main character's name in Undertale?": ["Frisk", "Chara", "Asriel", "Flowey"],
+        "What's the name of the underground city?": ["Snowdin", "Waterfall", "Hotland", "New Home"],
+        "What's the name of the two skeleton brothers?": ["Sans and Papyrus", "Sans and Gaster", "Papyrus and Gaster", "Sans and Flowey"],
+        "UT: Who do you play as?": ["Frisk", "Chara", "Asriel", "Flowey", "Kris"],
         "What is the name of the first human to fall into the Underground?": ["Chara", "Frisk", "Asriel", "Flowey"],
-        "Who is the leader of the Royal Guard in Undertale?": ["Undyne", "Asgore", "Mettaton", "Sans"],
+        "Who is the leader of the Royal Guard?": ["Undyne", "Asgore", "Mettaton", "Sans"],
+        "What flower talks to you at the start of the game?": ["Flowey", "Daisy", "Petunia", "Rose"],
+        "What song plays when you fight Sans?": ["Megalovania", "Bonetrousle", "Death by Glamour", "Hopes and Dreams", "the song that might play when you fight sans"],
+        "What's the name of the secret bosses that appears in the True Lab?": ["Amalgamates", "Gaster", "Muffet", "Napstablook"],
+        "What song plays when you fight Papyrus?": ["Nyeh Heh Heh!", "Bonetrousle", "the song that might play when you fight sans", "Blue!"],
+        "What's the name of the dog that steals your legendary artifact?": ["Annoying Dog", "Lesser Dog", "Greater Dog", "Doggo"],
+        "What's the name of the Frisk's SOUL Trait?": ["Determination", "Courage", "Kindness", "Justice", "Detemmienation"],
+        "What's the name of the soul trait that represents justice?" :["Justice", "Courage", "Honesty", "Wisdom"],
+        "What's the name of the final boss in the pacifist route?": ["Asriel Dreemurr", "Omega Flowey", "Chara Dreemurr", "Frisk Dreemurr"],
+        "What's the name of the resort hotel in Hotland?": ["MTT Resort", "CORE Resort", "Royal Resort", "Hot Resort"],
+        "What's the name of the ghost that haunts a dummy in Waterfall?": ["Mad Dummy","Napstablook", "Shyren's Agent", "Mettaton's Cousin", "Mew Mew Kissy Cutie"],
+        "What's the first boss?": ["Napstablook", "Toriel", "Froggit", "Flowey"],
+        "How much EXP do you need to get to LV19?": ["50000", "10000", "99999", "N/A. You need to kill Sans."],
+        "Who runs the Spider bake sale?": ["Muffet", "Charlotte", "Arachne", "Webby", "Gaster"],
+        "What's the name of the dog that loves to play fetch with you?": ["Lesser Dog", "Greater Dog", "Annoying Dog", "Temmie Dog"],
+        "What's the name of the monster that sells you ice cream in Snowdin?": ["Nice Cream Guy", "Ice Cap", "Gyftrot", "Snowdrake", "Undyne"],
+        "DR: Who do you play as?": ["Kris", "Chara", "Asriel", "Flowey", "Frisk"],
+        "What's the name of the dark prince who guides you in the Dark World?": ["Ralsei", "Lancer", "Asriel", "Susie"],
+        "What's the name of the card-themed king who rules over the First Dark World?": ["King of Spades", "King of Hearts", "King of Diamonds", "King of Clubs"],
+        "What's the name of the secret boss that appears in the unused classroom?": ["Jevil", "Gaster", "Seam", "Chaos King", "Spamton NEO", "Spamton EX"],
+        "What's the current USD to Kromer exchange rate?": ["999999999999", "999999999999", "999999999999", "999999999999", "1 Morbillion"],
+        "What attack stat does the EMPTY GUN give you?": ["+12AT", "+10AT", "+8AT", "+6AT", "+4AT", "+2AT", "+20AT"],
+        "What engine is Undertale made in?": ["Gamemaker Studio", "Clickteam Fusion", "Unity", "RPGMaker", "LÖVE"]
     }
 
     embed = disnake.Embed(title="METTATON'S **NEW** TRIVIA QUIZ", description="Guaranteed to have ALL NEW questions!")
@@ -62,7 +84,7 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
 
     # await asyncio.sleep(10)
 
-    questions = random.sample(sorted(undertale_trivia_questions_and_answers), k=10)
+    questions = random.sample(sorted(undertale_trivia_questions_and_answers), k=5)
 
     num_to_iterate = 0
 
@@ -92,3 +114,4 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
 
     db.award_tickets(player_score*100, member, "Trivia")
     # TODO: Make this give player_score*100 Tickets. Meagus.
+    # thanks meagus
