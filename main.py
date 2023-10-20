@@ -147,6 +147,91 @@ class GameStateManager:
         game = self.private_game_list[game_name]
         await game(pthread, typing.cast(disnake.Member, inter.author), bot, str(game_uid), optional_argument)
 
+    @bot.slash_command(name="shop")
+    async def shop(self, inter: disnake.ApplicationCommandInteraction):
+
+        rarities = {
+            0:"Common",
+            1:"Rare",
+            3:"Medium-Rare",
+            4:"Well-Done"
+        }
+
+        from database import Database
+        db2 = Database()  # Initialise the fucking singleton
+
+        shopkeepers = [
+            "https://media.discordapp.net/attachments/1164778377002090566/1164814503427452938/latest.png?ex=6544950a&is=6532200a&hm=215d0afa662dc5b8575016063344a2a42b69613c748cb5df99a098493278d8f6&=",
+            "https://media.discordapp.net/attachments/1164778377002090566/1164814503737839747/latest.png?ex=6544950a&is=6532200a&hm=b40d4a2933881af67dcd967be4684b697a356c73444505d2105e157d69065f6e&=",
+            "https://media.discordapp.net/attachments/1164778377002090566/1164814504056598578/latest.png?ex=6544950a&is=6532200a&hm=39dd8f3139deeb4fd5faa2004b97fbad722e040707da49725dbf060c906bd05c&=",
+            "https://media.discordapp.net/attachments/1164778377002090566/1164814504341819452/latest.png?ex=6544950b&is=6532200b&hm=6a2a1115d19ca17469f094fc6120973e9307cc9b19ecc5c18bba3e81a46dd486&=",
+            "https://media.discordapp.net/attachments/1164778377002090566/1164814504710901832/latest.png?ex=6544950b&is=6532200b&hm=85a0c92e9fb4ce23e9cb7000d28b07fbd3665e970cf72049f34dda0d5eac97dd&=",
+            "https://media.discordapp.net/attachments/1164778377002090566/1164814505075814430/latest.png?ex=6544950b&is=6532200b&hm=086229b385df7c28d0b2ea59575fd6bbac5a06da6eec63ce58408c0f300caf2c&=",
+            "https://media.discordapp.net/attachments/1164778377002090566/1164814505331675196/latest.png?ex=6544950b&is=6532200b&hm=1fa5613395abc24718e00cd47b8c6abfb0e18233f7ed054862120a0f7ddd059c&=",
+            "https://media.discordapp.net/attachments/1164778377002090566/1164814505604288552/latest.png?ex=6544950b&is=6532200b&hm=905cba0baa5f1f59735732ca969a2ac9b2d1249203124901135a04560b428634&=",
+            "https://media.discordapp.net/attachments/1164778377002090566/1164814505973403658/latest.png?ex=6544950b&is=6532200b&hm=0626bfaa5dbb8a3a0a68ec66df0261b9d59155405c0fb0675fd42f1b17611308&="
+        ]
+
+        # Gets All Shop Items (Rarity 0)
+        bad_items_cur = db2.db.execute("select * from prizes where rarity = 0")
+        bad_items = bad_items_cur.fetchall()
+
+        # Gets All Shop Items (Rarity 1)
+        less_bad_items_cur = db2.db.execute("select * from prizes where rarity = 1")
+        less_bad_items = less_bad_items_cur.fetchall()
+
+        # Gets the current random seed for this user.
+        now = datetime.datetime.now()
+        hour = 0
+        if now.hour >= 18:
+            hour = 18
+        elif now.hour >= 12:
+            hour = 12
+        elif now.hour >= 6:
+            hour = 6
+        time_seed = f"{now.day}{hour}{inter.author.id}"
+
+        # Builds the Embed
+
+        embed = disnake.Embed(title="Welcome to the SHOP!", description="placeholder")
+        embed.add_field(name="1000 Tickets | Prize Crate", value="Guaranteed to contain a prize of some sort.\nWarning: Content Quality is not Guaranteed.")
+        shop_menu = disnake.ui.Select()
+
+        random.seed(time_seed)
+        random.shuffle(bad_items)
+        current_prizes = bad_items[:4]
+        current_prizes.append(random.choice(less_bad_items))
+
+        for prize in current_prizes:
+            embed.add_field(name=f"{(prize[3]+1)*500} Tickets | {prize[1]} ({rarities[prize[3]]})", value=prize[2])
+            shop_menu.add_option(value=f"{prize[0]}", label=f"{prize[1]} ({({rarities[prize[3]]})})", description=f"Buy this for {(prize[3]+1)*500} Tickets")
+        shop_menu.add_option(value="1000", label="1000 Tickets | Prize Crate", description="Warning: Content Quality is not Guaranteed.")
+        shop_menu.custom_id = time_seed
+        embed.set_image(random.choice(shopkeepers))
+        random.seed(hash(time.time()))
+        await inter.send(embed=embed, ephemeral=True, components=shop_menu)
+
+        @bot.listen("on_dropdown")
+        async def on_prize_select(inter2: disnake.MessageInteraction):
+            if inter2.data.custom_id == time_seed:
+                data = inter2.data.values[0]
+
+                user_tickets, = db.get_tickets(inter2.author)
+
+                if data == 1000:
+                    pass # They have purchased a loot crate
+                else:
+                    prize_list_cur = db2.db.execute("select * from prizes")
+                    prize_list = prize_list_cur.fetchall()
+                    selected_prize = prize_list[int(data)]
+                    prize_cost = (selected_prize[3]+1)*500
+                    if user_tickets < prize_cost:
+                        await inter2.send(f"You do not have enough tickets to purchase this prize! This prize costs {prize_cost}, but you only have {user_tickets}!", ephemeral=True)
+                        return
+                    else:
+                        db.award_prize(inter2.author, 'Shop', data)
+                        db.award_tickets((0-prize_cost), inter2.author, 'Shop')
+                        await inter2.send(f"Congratulations! You have obtained a {rarities[selected_prize[3]]} {selected_prize[1]}!\nYou can view your inventory with `/inv`", ephemeral=True)
 
 @web.get("/api/consume_session")
 async def consume_session(session: str):
