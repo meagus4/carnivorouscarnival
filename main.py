@@ -104,7 +104,7 @@ class GameStateManager:
     async def start_new_private_game(
             self,
             inter: disnake.ApplicationCommandInteraction,
-            game_name: PrivateGameName,  # type: ignore - this is actually perfectly fine
+            game_name: PrivateGameName,  ## type: ignore - this is actually perfectly fine
             optional_argument: str | None = None):
         """
         Start a new game in a private thread.
@@ -219,14 +219,19 @@ class GameStateManager:
                 user_tickets, = db.get_tickets(inter2.author)
 
                 if data == 1000:
-                    pass # They have purchased a loot crate
+                    if user_tickets < 1000:
+                        await inter2.send(f"You do not have enough tickets to purchase this prize! This prize costs 1000 Tickets, but you've only got {user_tickets}!", ephemeral=True)
+                        return
+                    else:
+                        db.award_random_prize()
+                        await inter2.send("You have purchased a Loot Box! Inside the loot box you find...") # TODO: Make this actually tell you the prize you won. See issue #12
                 else:
                     prize_list_cur = db2.db.execute("select * from prizes")
                     prize_list = prize_list_cur.fetchall()
                     selected_prize = prize_list[int(data)]
                     prize_cost = (selected_prize[3]+1)*500
                     if user_tickets < prize_cost:
-                        await inter2.send(f"You do not have enough tickets to purchase this prize! This prize costs {prize_cost}, but you only have {user_tickets}!", ephemeral=True)
+                        await inter2.send(f"You do not have enough tickets to purchase this prize! This prize costs {prize_cost} Tickets, but you've only got {user_tickets}!", ephemeral=True)
                         return
                     else:
                         db.award_prize(inter2.author, 'Shop', data)

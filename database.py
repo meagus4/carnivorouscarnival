@@ -21,7 +21,7 @@ class Database:
             make_database(db_filename)
         self.db = sqlite3.connect(db_filename)
     def get_tickets(self, user: disnake.Member) -> int:
-        res = self.db.execute("SELECT sum(ticket_change) FROM ticket_wins WHERE user = ?", (user.id,)).fetchone()
+        res, = self.db.execute("SELECT sum(ticket_change) FROM ticket_wins WHERE user = ?", (user.id,)).fetchone()
         return res if res else 0
     def award_tickets(self, count: int, user: disnake.Member, game: str) -> None:
         self.db.execute("INSERT INTO ticket_wins (user, game, ticket_change) VALUES (?, ?, ?)", (user.id, game, count))
@@ -37,9 +37,14 @@ class Database:
         self.db.commit()
     def get_prize_wins(self, user: disnake.Member) -> list:
         return self.db.execute("SELECT * FROM prize_wins WHERE user = ?", (user.id,)).fetchall()
-    def award_random_prize(self, user: disnake.Member, game: str) -> None:
-        self.db.execute("INSERT INTO prize_wins (user, game, prize) SELECT ?, ?, prizes.id from prizes order by random() limit 1", (user.id, game))
+
+    def award_random_prize(self, user: disnake.Member, game: str, rarity: int) -> int:
+        self.db.execute(
+            "INSERT INTO prize_wins (user, game, prize) SELECT ?, ?, prizes.id from prizes WHERE rarity = ? order by random() limit 1",
+            (user.id, game, rarity))
+        res = self.db.execute("select prize from prize_wins where rowid = last_insert_rowid()")
         self.db.commit()
+        return res.fetchall()[0]
     def create_web_game_session(self, user: disnake.Member, game: str, additional_context: dict = {}) -> str:
         additional_context["ts"] = datetime.datetime.now().timestamp()
         token = jwt.make_token(user, additional_context)
@@ -70,6 +75,13 @@ class Database:
         self.db.execute("UPDATE web_game_sessions SET status = 2 and points = ? and time_finished = ? WHERE session_token = ? and status = 1", (points, time_finished, token))
         self.db.commit()
         return True, "Valid."
+    def get_prize(self, id: int):
+        return self.db.execute("select * from prizes where id = ?", (id,)).fetchall()[0]
+    def get_game_data(self, game:str, user: disnake.Member):
+        return self.db.execute("select * from game_data where game = ? and user = ?", (game, user.id)).fetchone() or 0
+    def set_game_data(self, game: str, user:disnake.Member, data: str) -> None:
+        self.db.execute("INSERT INTO game_data (game, user, data) VALUES (?, ?, ?)", (game, user.id, data))
+        self.db.commit()
 
 def make_database(file: str):
     schema = open("schema.sql").read()

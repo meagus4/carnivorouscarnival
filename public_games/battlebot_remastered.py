@@ -231,7 +231,8 @@ async def newEmbed(flavour, monster, time, health, maxhealth, actions='ATTACKS..
                 if len(t_dead_text) >= 900:
                     t_dead_text = f'{t_dead_text}(+ more...)'
                     break
-                t_dead_text = f'{t_dead_text}{await bot.get_or_fetch_user(i).name} (0/100 HP)\n'
+                the_user = await bot.get_or_fetch_user(i)
+                t_dead_text = f'{t_dead_text}{the_user.name} (0/100 HP)\n'
             else:
                 player_alive = True
                 if len(t_alive_text) >= 900:
@@ -302,38 +303,22 @@ async def candyHandler(interaction):
         if hitpoints[i] == 0:
             dead_players.append(i)
 
-    staff_members = ['Orangestar', 'Bliv', 'Atlas', 'Casey', 'Meagus', '[DR]', 'Norkas', 'Kibi Byte', 'Obvious', 'Marr',
-                     'Drach', 'Miss Edurad', 'Zeyphr', 'Molimo', 'Smol Bot', 'Your Best Friend', 'Suns Undertale']
-
     if len(dead_players) == 0:
-        if True:
-            candyToLose = 0
-            cEmbed = disnake.Embed(title=f'You try to spend some Tickets.',
-                                   description=f'Unfortunately, there was nobody to revive! You got a novelty {random.choice(staff_members)} action figure for your efforts. You still have {cur_can} Kromer.\n_(Another one for the collection!)_',
-                                   color=0x388500)
-            userList.remove(interaction.author.id)
-        else:
-            cEmbed = disnake.Embed(title='You tried to spend some Kromer.',
-                                   description='But you\'re already broke!', color=0x388500)
-            try:
-                userList.remove(interaction.author.id)
-            except Exception as e:
-                print(e)
+        cEmbed = disnake.Embed(title=f'You try to pick up the fallen..',
+                                description=f'Unfortunately, there was nobody to revive!',
+                                color=0x388500)
+        userList.remove(interaction.author.id)
     else:
-        finalcandy = cur_can - candyToLose
         player = random.choice(dead_players)
         guild = interaction.guild
         user = guild.get_member(player)
         cEmbed = disnake.Embed(title=f'You spend a turn healing {user.name}.',
-                               description=f'{user.name} (<@{player}>) was healed by 20 health!\nAs a reward for your generosity, you have been granted 1 Pipis!',
+                               description=f'{user.name} (<@{player}>) was healed by 20 health!',
                                color=0x65EA00)
         hitpoints[player] = 20
         deadlist.remove(player)
         if player not in userList:
             userList.append(player)
-        reward = 1
-
-    addCandies(interaction.author, -candyToLose, reward)
 
     await interaction.send(embed=cEmbed, ephemeral=True)
 
@@ -397,13 +382,15 @@ async def play_game(channel, disnake_bot, optional_argument=None):
             disnake.ui.Button(label="🗡️ Attack Enemy", custom_id=f"attack_enemy", style=disnake.Color(4),
                               disabled=False),
             disnake.ui.Button(label="💊 Heal Yourself", custom_id=f"heal_player", style=disnake.Color(3),
-                              disabled=False),
-            disnake.ui.Button(label="💰 Make a [DEAL]", custom_id=f"throw_candy", style=disnake.Color(1),
                               disabled=False))])
 
     @bot.listen("on_button_click")
     async def on_button_click(interaction):
         global userList, hitpoints, action_to_process
+
+        if interaction.component.custom_id != 'attack_enemy' and interaction.component.custom_id != 'heal_player' and interaction.component.custom_id != 'throw_candy':
+            interaction.response.defer()
+            return
 
         if turn is False and battleOngoing is True:
             await interaction.send(content="The monster is currently taking their turn so you cannot act!",
@@ -465,9 +452,7 @@ async def play_game(channel, disnake_bot, optional_argument=None):
                             disnake.ui.ActionRow(disnake.ui.Button(label="🗡️ Attack Enemy", custom_id=f"attack_enemy",
                                                                    style=disnake.Color(4), disabled=False),
                                                  disnake.ui.Button(label="💊 Heal Yourself", custom_id=f"heal_player",
-                                                                   style=disnake.Color(3), disabled=False),
-                                                 disnake.ui.Button(label="💰 Make a [DEAL]", custom_id=f"throw_candy",
-                                                                   style=disnake.Color(1), disabled=False))])
+                                                                   style=disnake.Color(3), disabled=False))])
                 except Exception as e:
                     print("Threw Exception! ", e)
                 action_to_process = False
@@ -483,8 +468,6 @@ async def play_game(channel, disnake_bot, optional_argument=None):
                     disnake.ui.Button(label="🗡️ Attack Enemy", custom_id=f"attack_enemy", style=disnake.Color(4),
                                       disabled=True),
                     disnake.ui.Button(label="💊 Heal Yourself", custom_id=f"heal_player", style=disnake.Color(3),
-                                      disabled=True),
-                    disnake.ui.Button(label="💰 Make a [DEAL]", custom_id=f"throw_candy", style=disnake.Color(1),
                                       disabled=True))])
             attacking = True
             attacked = {}
@@ -531,7 +514,8 @@ async def play_game(channel, disnake_bot, optional_argument=None):
                 if hitpoints[t_attacked] < 0:
                     t_dmg = t_dmg + hitpoints[t_attacked]
                     hitpoints[t_attacked] = 0
-                attackstring = f'{attackstring}{await bot.get_or_fetch_user(t_attacked).name} for {t_dmg} Damage!\n'
+                user = await bot.get_or_fetch_user(t_attacked)
+                attackstring = f'{attackstring}{await user.name} for {t_dmg} Damage!\n'
                 embed = await newEmbed(f"{mname} is taking their turn!", monster, f"...<t:{int(atk_time + 16 + atkcount)}:R>",
                                  monster_HP,
                                  monster_HP_MAX, actions=f"Turn ends...:", color=0xFFD800)
@@ -552,8 +536,6 @@ async def play_game(channel, disnake_bot, optional_argument=None):
                     disnake.ui.Button(label="🗡️ Attack Enemy", custom_id=f"attack_enemy", style=disnake.Color(4),
                                       disabled=True),
                     disnake.ui.Button(label="💊 Heal Yourself", custom_id=f"heal_player", style=disnake.Color(3),
-                                      disabled=True),
-                    disnake.ui.Button(label="💰 Make a [DEAL]", custom_id=f"throw_candy", style=disnake.Color(1),
                                       disabled=True))])
             await asyncio.sleep(5)
         action_to_process = True
@@ -580,16 +562,18 @@ async def play_game(channel, disnake_bot, optional_argument=None):
                 tmpUSR = i
 
         if tmpUSR != 0:
+            user = await bot.get_or_fetch_user(lastAttacker)
             vEmbed.add_field(name='Monster Defeated',
-                             value=f'{await bot.get_or_fetch_user(lastAttacker).name} got the final hit! They have been awarded {reg_c} Tickets!\n{await bot.get_or_fetch_user(tmpUSR).name} did the most damage, with {tmpDMG} damage! They have been awarded {dmg_c} Tickets', inline=False)
+                             value=f'{user.name} got the final hit! They have been awarded {reg_c} Tickets!\n{await bot.get_or_fetch_user(tmpUSR).name} did the most damage, with {tmpDMG} damage! They have been awarded {dmg_c} Tickets', inline=False)
         else:
+            user = await bot.get_or_fetch_user(lastAttacker)
             vEmbed.add_field(name='Monster Defeated',
-                             value=f'{await bot.get_or_fetch_user(lastAttacker).name} got the final hit! They have been awarded {reg_c} Tickets!',
+                             value=f'{await user.name} got the final hit! They have been awarded {reg_c} Tickets!',
                              inline=False)
         loss = False
-        addCandies(await bot.get_or_fetch_user(lastAttacker), reg_c)
+        addCandies(user, reg_c)
         if tmpUSR != 0:
-            addCandies(await bot.get_or_fetch_user(tmpUSR), dmg_c, dmg_r)
+            addCandies(user, dmg_c, dmg_r)
     else:
         fight_average.append(0)
         msg = f"{mname} got away!"
