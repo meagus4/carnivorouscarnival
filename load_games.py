@@ -12,7 +12,7 @@ def load_public_games() -> PublicGameList:
     for file in os.listdir('public_games'):
         if not file.endswith(".py"):
             continue
-        name = file.strip(".py")
+        name = file.removesuffix(".py")
         module = importlib.import_module(f'public_games.{name}')
         try:
             public_game_list[name] = module.play_game
@@ -28,7 +28,7 @@ def load_private_games() -> PrivateGameList:
     for file in os.listdir('private_games'):
         if not file.endswith(".py"):
             continue
-        name = file.strip(".py")
+        name = file.removesuffix(".py")
         module = importlib.import_module(f'private_games.{name}')
         try:
             private_game_list[name] = module.play_game
