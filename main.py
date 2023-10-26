@@ -265,14 +265,18 @@ async def submit_session(session: str, game_name: str, score: str):
     """
     Submit a completed game using your session token. Games can be submitted *once*.
     """
-    # I don't know why game_name is being submitted. Whatever.
-
-    # i also don't know why we validate the token in this module for the
+    # i don't know why we validate the token in this module for the
     # function immediately above, but for submitting game results the validation
     # is already baked into the DB validation method in the other module.
     # 2 am programming, i guess.
 
     valid, reason = db.submit_game_results(session, score)
+
+    token = tokentools.decrypt_token(session)
+    user = await bot.get_or_fetch_user(token['user']['id'])
+
+    if valid:
+        db.award_tickets(score, user, game_name)
     
     return responses.JSONResponse({"valid" : valid, "reason": reason}, status_code=200 if valid else 400)
 
