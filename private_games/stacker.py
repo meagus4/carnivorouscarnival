@@ -38,7 +38,7 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
 
     # Initializes Embed / Message
     embed = disnake.Embed(title="Stacker", description="Stacker Game Initializing...")
-    message = await thread.send("Embed here!", embed=embed)
+    message = await thread.send(embed=embed)
 
     # Listens for Button Clicks
     @bot.listen("on_button_click")

@@ -73,7 +73,6 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
     @bot.listen("on_button_click")
     async def on_button_click(inter: disnake.MessageInteraction):
         nonlocal spin_active
-        print("button happened")
         if inter.component.custom_id.startswith(uid):
             await inter.send("Inflating the Balloon!", ephemeral=True)
             spin_active = True
@@ -99,9 +98,7 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
     message = await thread.send(embed=embed, components=spin_button)
 
     while attempts > 0 and not balloon_popped:
-        print("game loop started")
         while spin_active:
-            print("spin started")
             if possible_progress[step] == 1:
                 display += "🟥"
             elif possible_progress[step] == 2:
@@ -135,7 +132,6 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
 
         if spin_active:
             attempts -= 1
-            print(progress)
 
             if display[0] == "🟥":
                 progress_text = f"The wheel has finished! You made a small amount of progress on inflating the balloon."
