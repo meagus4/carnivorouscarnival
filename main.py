@@ -8,6 +8,7 @@ import random
 from config import load_config
 import fastapi
 from fastapi import responses
+from fastapi.middleware.cors import CORSMiddleware
 import asyncio
 import database
 db = database.Database()
@@ -28,12 +29,23 @@ bot = Bot(command_prefix=when_mentioned, intents=intents)
 gsm = None
 config = load_config()
 
+CORS_ORIGINS = config["cors_origins"]
+# this might error if this is empty. Too bad!
+
 docs = True
 if docs:
     web = fastapi.FastAPI()
 else:
     web = fastapi.FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 
+
+web.add_middleware(
+    CORSMiddleware,
+    allow_origins=CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 @bot.event
 async def on_ready():
