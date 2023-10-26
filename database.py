@@ -78,9 +78,14 @@ class Database:
     def get_prize(self, id: int):
         return self.db.execute("select * from prizes where id = ?", (id,)).fetchall()[0]
     def get_game_data(self, game:str, user: disnake.Member):
-        return self.db.execute("select * from game_data where game = ? and user = ?", (game, user.id)).fetchone() or 0
+        return self.db.execute("select data from game_data where game = ? and user = ?", (game, user.id)).fetchone()
     def set_game_data(self, game: str, user:disnake.Member, data: str) -> None:
-        self.db.execute("INSERT INTO game_data (game, user, data) VALUES (?, ?, ?)", (game, user.id, data))
+        temp_data = self.db.execute("select data from game_data where game = ? and user = ?", (game, user.id)).fetchone()
+
+        if temp_data:
+            self.db.execute("UPDATE game_data SET data = ? WHERE game = ? and user = ?", (data, game, user.id))
+        else:
+            self.db.execute("INSERT INTO game_data (game, user, data) VALUES (?, ?, ?)", (game, user.id, data))
         self.db.commit()
 
 def make_database(file: str):

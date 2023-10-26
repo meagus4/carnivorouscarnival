@@ -389,7 +389,6 @@ async def play_game(channel, disnake_bot, optional_argument=None):
         global userList, hitpoints, action_to_process
 
         if interaction.component.custom_id != 'attack_enemy' and interaction.component.custom_id != 'heal_player' and interaction.component.custom_id != 'throw_candy':
-            interaction.response.defer()
             return
 
         if turn is False and battleOngoing is True:
