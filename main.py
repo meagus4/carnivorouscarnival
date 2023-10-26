@@ -265,9 +265,16 @@ async def submit_session(session: str, game_name: str, score: str):
     """
     Submit a completed game using your session token. Games can be submitted *once*.
     """
-    print("session: ", session, "\ngame_name: ", game_name, "\nscore: ", score)
-    #TODO FIX
-    return {"submitted": True}
+    # I don't know why game_name is being submitted. Whatever.
+
+    # i also don't know why we validate the token in this module for the
+    # function immediately above, but for submitting game results the validation
+    # is already baked into the DB validation method in the other module.
+    # 2 am programming, i guess.
+
+    valid, reason = db.submit_game_results(session, score)
+    
+    return responses.JSONResponse({"valid" : valid, "reason": reason}, status_code=200 if valid else 400)
 
 
 if __name__ == '__main__':

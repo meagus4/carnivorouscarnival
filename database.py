@@ -59,7 +59,7 @@ class Database:
             return False
         #Burn token
         time_played = datetime.datetime.now()
-        self.db.execute("UPDATE web_game_sessions SET status = 1, time_played = ?, session_token = ? and status = 0", (time_played, token))
+        self.db.execute("UPDATE web_game_sessions SET status = 1, time_played = ? WHERE session_token = ? and status = 0", (time_played, token))
         self.db.commit()
         return True
     def submit_game_results(self, token: str, points: int) -> tuple[bool, str]:
@@ -72,7 +72,7 @@ class Database:
         if len(res) == 0:
             return False, "Invalid Token"
         time_finished = datetime.datetime.now()
-        self.db.execute("UPDATE web_game_sessions SET status = 2 and points = ? and time_finished = ? WHERE session_token = ? and status = 1", (points, time_finished, token))
+        self.db.execute("UPDATE web_game_sessions SET status = 2, points = ?, time_finished = ? WHERE session_token = ? and status = 1", (points, time_finished, token))
         self.db.commit()
         return True, "Valid."
     def get_prize(self, id: int):
