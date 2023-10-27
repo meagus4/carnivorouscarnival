@@ -169,9 +169,6 @@ class GameStateManager:
             4:"Well-Done"
         }
 
-        from database import Database
-        db2 = Database()  # Initialise the fucking singleton
-
         shopkeepers = [
             "https://media.discordapp.net/attachments/1164778377002090566/1164814503427452938/latest.png?ex=6544950a&is=6532200a&hm=215d0afa662dc5b8575016063344a2a42b69613c748cb5df99a098493278d8f6&=",
             "https://media.discordapp.net/attachments/1164778377002090566/1164814503737839747/latest.png?ex=6544950a&is=6532200a&hm=b40d4a2933881af67dcd967be4684b697a356c73444505d2105e157d69065f6e&=",
@@ -185,11 +182,11 @@ class GameStateManager:
         ]
 
         # Gets All Shop Items (Rarity 0)
-        bad_items_cur = db2.db.execute("select * from prizes where rarity = 0")
+        bad_items_cur = db.db.execute("select * from prizes where rarity = 0")
         bad_items = bad_items_cur.fetchall()
 
         # Gets All Shop Items (Rarity 1)
-        less_bad_items_cur = db2.db.execute("select * from prizes where rarity = 1")
+        less_bad_items_cur = db.db.execute("select * from prizes where rarity = 1")
         less_bad_items = less_bad_items_cur.fetchall()
 
         # Gets the current random seed for this user.
@@ -238,7 +235,7 @@ class GameStateManager:
                         db.award_random_prize()
                         await inter2.send("You have purchased a Loot Box! Inside the loot box you find...") # TODO: Make this actually tell you the prize you won. See issue #12
                 else:
-                    prize_list_cur = db2.db.execute("select * from prizes")
+                    prize_list_cur = db.db.execute("select * from prizes")
                     prize_list = prize_list_cur.fetchall()
                     selected_prize = prize_list[int(data)]
                     prize_cost = (selected_prize[3]+1)*500
