@@ -140,6 +140,8 @@ class GameStateManager:
         game_uid += sys.maxsize + 1
         print("gameuid", game_uid)
 
+        member = typing.cast(disnake.Member, inter.author)
+
         if parent_channel_id != self.private_game_channel.id:
             return await inter.send(f"You can only play games in {self.private_game_channel.mention}.", ephemeral=True)
 
@@ -147,16 +149,21 @@ class GameStateManager:
             buf = "Please select a valid game. Games include:\n"
             buf += "\n".join(self.private_game_list.keys())
             return await inter.send(buf, ephemeral=True)
+        
+        tokens = db.get_tokens(member,"private")
+        if tokens <= 0:
+            return await inter.send("Sorry, you're out of tokens! (Tokens return to you 3 hours after you use them)", ephemeral=True) 
 
         pthread = inter.channel if isinstance(inter.channel, disnake.Thread) else await self.private_game_channel.create_thread(name=game_name, type=disnake.ChannelType.private_thread)
-
+    
         if in_thread:
-            await inter.send(f"Starting {game_name}...")
+            await inter.send(f"Starting {game_name}...\n You have {tokens} tokens left.")
         else:
             await pthread.send(f"Starting {game_name}... {inter.author.mention}")
-            await inter.send(f"Check {pthread.mention}", ephemeral=True)
+            await inter.send(f"Check {pthread.mention}. You have {tokens} tokens left.", ephemeral=True)
 
         game = self.private_game_list[game_name]
+        db.consume_tokens(1, member,game_name, "private")
         await game(pthread, typing.cast(disnake.Member, inter.author), bot, str(game_uid), optional_argument)
 
     @bot.slash_command(name="shop")

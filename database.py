@@ -26,12 +26,13 @@ class Database:
     def award_tickets(self, count: int, user: disnake.Member, game: str) -> None:
         self.db.execute("INSERT INTO ticket_wins (user, game, ticket_change) VALUES (?, ?, ?)", (user.id, game, count))
         self.db.commit()
-    def consume_tokens(self, count: int, user: disnake.Member, game: str, token_type: str) -> None:
+    def consume_tokens(self, count: int, user: disnake.Member, game: str, token_type: typing.Literal["public","private"]) -> None:
         self.db.execute("INSERT INTO consumed_tokens (token_type, user, game, token_change) VALUES (?,?, ?, ?)", (token_type, user.id, game, count))
         self.db.commit()
-    def get_used_tokens(self, user: disnake.Member, hours: int = default_bucket_hours) -> int:
+    def get_tokens(self, user: disnake.Member, token_type: typing.Literal["public","private"], hours: int = default_bucket_hours) -> int:
         cur = self.db.execute("SELECT sum(token_change) FROM consumed_tokens WHERE user = ? and datetime > datetime('now', ?)", (user.id, f"{-hours} hour"))
-        return cur.fetchall()[0]
+        res = cur.fetchall()[0][0] or 0
+        return 9 - res
     def award_prize(self, user: disnake.Member, game: str, prize: int) -> None:
         self.db.execute("INSERT INTO prize_wins (user, game, prize) VALUES (?, ?, ?)", (user.id, game, prize))
         self.db.commit()
