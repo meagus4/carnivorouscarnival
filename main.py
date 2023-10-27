@@ -267,15 +267,19 @@ async def submit_session(session: str, game_name: str, score: str):
     # is already baked into the DB validation method in the other module.
     # 2 am programming, i guess.
 
-    valid, reason = db.submit_game_results(session, score)
+    valid, reason = db.submit_game_results(session, int(score))
 
     token = tokentools.decrypt_token(session)
-    user = await bot.get_or_fetch_user(token['user']['id'])
 
+    tickets = 0
     if valid:
-        db.award_tickets(score, user, game_name)
-    
-    return responses.JSONResponse({"valid" : valid, "reason": reason}, status_code=200 if valid else 400)
+        try:
+            user = await bot.get_or_fetch_user(token['user']['id'])
+        except:
+            return responses.JSONResponse({"valid": False, "reason": "Discord: Unable to fetch user"}, status_code=400)
+        db.award_tickets(int(score), typing.cast(disnake.Member,user), game_name)
+        tickets = db.get_tickets(typing.cast(disnake.Member,user))
+    return responses.JSONResponse({"valid" : valid, "reason": reason,"tickets": tickets}, status_code=200 if valid else 400)
 
 
 if __name__ == '__main__':
