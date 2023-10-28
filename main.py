@@ -298,6 +298,32 @@ class GameStateManager:
         await inter.send("Goodbye!")
         exit(99)
 
+    @bot.slash_command(name="get_used_tokens")
+    async def get_used_tokens(self, inter: disnake.ApplicationCommandInteraction):
+        """
+        Gets used tokens.
+        """
+        dbres = db.get_token_history(typing.cast(disnake.Member, inter.author), 'private')
+        buf = ""
+        for t in dbres:
+            ts = datetime.datetime.strptime(t[2], "%Y-%m-%d %H:%M:%S")
+            buf += f'''Game name: **{t[0]}**, Tokens consumed to play: **{t[1]}**, Consumed at: {disnake.utils.format_dt(ts)}\n'''
+        return await inter.send(buf, ephemeral=True)
+    
+    @bot.slash_command(name="modify_tokens", permissions=disnake.Permissions(manage_messages=True))
+    async def modify_tokens(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member, token_adjustment: int):
+        """
+        Adjusts a player's token balance for 3 hours.
+
+        Parameters
+        ----------
+        user_id: Discord User ID
+        token_adjustment: The number of tokens you wish to add to the user, expiring in 3 hours.
+        """
+        token_change = -token_adjustment
+        db.consume_tokens(token_change, user, "Moderator action", 'private')
+        await inter.send("Tokens adjusted", ephemeral=True)
+
 @web.get("/api/consume_session")
 async def consume_session(session: str):
     """

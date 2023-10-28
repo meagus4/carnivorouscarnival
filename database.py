@@ -49,6 +49,12 @@ class Database:
         res = cur.fetchall()[0][0] or 0
         return 9 - res
 
+    def get_token_history(self, user: disnake.Member, token_type: typing.Literal["public", "private"], hours: int= default_bucket_hours) -> list:
+        cur = self.db.execute(
+            "SELECT game, token_change, datetime from consumed_tokens where user = ? and datetime > datetime('now', ?)", (user.id, f"{-hours} hour"))
+        res = cur.fetchall()
+        return res
+
     def award_prize(self, user: disnake.Member, game: str, prize: int) -> None:
         self.db.execute(
             "INSERT INTO prize_wins (user, game, prize) VALUES (?, ?, ?)", (user.id, game, prize))
