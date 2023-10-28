@@ -1,6 +1,7 @@
 import datetime
 import importlib
 import json
+import math
 import os
 import sys
 import time
@@ -108,7 +109,13 @@ class GameStateManager:
         game_name: The game to start.
         optional_argument: An optional argument to pass to the game.
         """
+
+        # Ugliest bodge I've ever written, please fix
+        # it's needed here too. i hate it. -bliv
+        self = typing.cast(GameStateManager, gsm)
+
         await self._start_new_public_game(game_name, optional_argument)
+        await inter.send("Started the requested game.", ephemeral=True)
 
     @tasks.loop(minutes=config['public_game_interval'])
     async def start_timed_new_public_game(self):
@@ -206,14 +213,9 @@ class GameStateManager:
         less_bad_items = less_bad_items_cur.fetchall()
 
         # Gets the current random seed for this user.
-        now = datetime.datetime.now()
+        now = datetime.datetime.utcnow()
         hour = 0
-        if now.hour >= 18:
-            hour = 18
-        elif now.hour >= 12:
-            hour = 12
-        elif now.hour >= 6:
-            hour = 6
+        math.floor(now.hour/2)
         time_seed = f"{now.day}{hour}{inter.author.id}"
 
         # Builds the Embed
@@ -275,6 +277,8 @@ class GameStateManager:
 
     @bot.slash_command(name="inv")
     async def inventory(self, inter: disnake.ApplicationCommandInteraction, user:disnake.Member = None):
+
+        """View your, or another members' inventory."""
 
         inv_view = user or inter.author
         async def display_item(prize_dict:dict, embed:disnake.Embed, index):

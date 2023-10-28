@@ -536,9 +536,9 @@ async def play_game(channel, bot2, optional_argument=None):
         fight_average.append(1)
         msg = f"{mname} was defeated!"
         vEmbed = await newEmbed(msg, monster, 0, 0, monster_HP_MAX, actions=False)
-        reg_c = random.randrange(20, 45)
+        reg_c = random.randrange(100, 450)
 
-        dmg_c = random.randrange(25, 55)
+        dmg_c = random.randrange(90, 400)
         dmg_r = random.randrange(2, 4)
 
         bestAttacker = None
@@ -552,7 +552,7 @@ async def play_game(channel, bot2, optional_argument=None):
         if tmpUSR != 0:
             user = await bot.get_or_fetch_user(lastAttacker)
             vEmbed.add_field(name='Monster Defeated',
-                             value=f'{user.name} got the final hit! They have been awarded {reg_c} Tickets!\n{await bot.get_or_fetch_user(tmpUSR).name} did the most damage, with {tmpDMG} damage! They have been awarded {dmg_c} Tickets', inline=False)
+                             value=f'{user.name} got the final hit! They have been awarded {reg_c} Tickets!\n{user} did the most damage, with {tmpDMG} damage! They have been awarded {dmg_c} Tickets', inline=False)
         else:
             user = await bot.get_or_fetch_user(lastAttacker)
             vEmbed.add_field(name='Monster Defeated',
@@ -561,7 +561,7 @@ async def play_game(channel, bot2, optional_argument=None):
         loss = False
         addCandies(user, reg_c)
         if tmpUSR != 0:
-            addCandies(user, dmg_c, dmg_r)
+            addCandies(user, dmg_c)
     else:
         fight_average.append(0)
         msg = f"{mname} got away!"
@@ -587,7 +587,7 @@ async def attack(action, player_hp):
     elif player_hp < 25:
         attackDmg = int(attackDmg * 1.35)
 
-    n_C = random.randrange(2, 7)
+    n_C = random.randrange(30, 80)
 
     if avg < 0.3:
         rareChance = 80
