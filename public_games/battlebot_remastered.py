@@ -1,20 +1,10 @@
 import asyncio
-import json
-import operator
-import os
 import random
 import time
-from datetime import datetime
 import database
 
 db = database.Database()
 import disnake.ext.commands
-from disnake.ext import commands, tasks
-
-bot = None
-intents = disnake.Intents.default()
-intents.members = True
-intents.message_content = True
 
 action_to_process = False
 
@@ -327,10 +317,8 @@ async def healHandler(interaction):
     return await heal(interaction, hitpoints[interaction.author.id])
 
 
-async def play_game(channel, disnake_bot, optional_argument=None):
-    global old_userList, deadlist, old_deadlist, battleOngoing, hitpoints, monster_HP, lastAttacker, userList, turn, loss, dmgDone, fight_average, action_to_process, bot
-
-    bot = disnake_bot
+async def play_game(channel, bot, optional_argument=None):
+    global old_userList, deadlist, old_deadlist, battleOngoing, hitpoints, monster_HP, lastAttacker, userList, turn, loss, dmgDone, fight_average, action_to_process
 
     old_deadlist = deadlist
     deadlist = []

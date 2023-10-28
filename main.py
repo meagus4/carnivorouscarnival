@@ -1,5 +1,6 @@
 import datetime
 import importlib
+import json
 import os
 import sys
 import time
@@ -29,6 +30,8 @@ bot = Bot(command_prefix=when_mentioned, intents=intents)
 gsm = None
 config = load_config()
 
+bot.shutdown = False
+
 CORS_ORIGINS = config["cors_origins"]
 # this might error if this is empty. Too bad!
 
@@ -37,7 +40,6 @@ if docs:
     web = fastapi.FastAPI()
 else:
     web = fastapi.FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
-
 
 web.add_middleware(
     CORSMiddleware,
@@ -92,7 +94,7 @@ class GameStateManager:
         game = self.public_game_list[game_name]
         await game(target_channel, bot, optional_argument)
 
-    @bot.slash_command(name="play_public", permissions=disnake.Permissions(manage_messages=True))
+    @bot.slash_command(name="play_public", permissions=disnake.Permissions(manage_messages=True), guild_ids=[770428394918641694, 120330239996854274])
     async def start_new_public_game(
             self,
             inter: disnake.ApplicationCommandInteraction | None,
@@ -112,7 +114,7 @@ class GameStateManager:
     async def start_timed_new_public_game(self):
         await self._start_new_public_game()
 
-    @bot.slash_command(name="play")
+    @bot.slash_command(name="play", guild_ids=[770428394918641694, 120330239996854274])
     async def start_new_private_game(
             self,
             inter: disnake.ApplicationCommandInteraction,
@@ -126,6 +128,12 @@ class GameStateManager:
         game_name: The game you want to play.
         optional_argument: An optional argument to pass to the game.
         """
+
+        # Prevents new games being started if Shutdown mode is enabled.
+        if bot.shutdown:
+            await inter.send("The bot is in a Shutdown state, new games cannot be started!", ephemeral=True)
+            return
+
         # Ugliest bodge I've ever written, please fix
         self = typing.cast(GameStateManager, gsm)
 
@@ -166,15 +174,11 @@ class GameStateManager:
         db.consume_tokens(1, member,game_name, "private")
         await game(pthread, typing.cast(disnake.Member, inter.author), bot, str(game_uid), optional_argument)
 
-    @bot.slash_command(name="shop")
+    @bot.slash_command(name="shop", guild_ids=[770428394918641694, 120330239996854274])
     async def shop(self, inter: disnake.ApplicationCommandInteraction):
 
-        rarities = {
-            0:"Common",
-            1:"Rare",
-            3:"Medium-Rare",
-            4:"Well-Done"
-        }
+        from database import Database
+        db2 = Database()  # Initialise the fucking singleton
 
         shopkeepers = [
             "https://media.discordapp.net/attachments/1164778377002090566/1164814503427452938/latest.png?ex=6544950a&is=6532200a&hm=215d0afa662dc5b8575016063344a2a42b69613c748cb5df99a098493278d8f6&=",
@@ -209,7 +213,7 @@ class GameStateManager:
 
         # Builds the Embed
 
-        embed = disnake.Embed(title="Welcome to the SHOP!", description="placeholder")
+        embed = disnake.Embed(title="Welcome to the SHOP!", description="Buy yourself some DISCOUNT prizes!!")
         embed.add_field(name="1000 Tickets | Prize Crate", value="Guaranteed to contain a prize of some sort.\nWarning: Content Quality is not Guaranteed.")
         shop_menu = disnake.ui.Select()
 
@@ -220,7 +224,7 @@ class GameStateManager:
 
         for prize in current_prizes:
             embed.add_field(name=f"{(prize[3]+1)*500} Tickets | {prize[1]} ({rarities[prize[3]]})", value=prize[2])
-            shop_menu.add_option(value=f"{prize[0]}", label=f"{prize[1]} ({({rarities[prize[3]]})})", description=f"Buy this for {(prize[3]+1)*500} Tickets")
+            shop_menu.add_option(value=f"{prize[0]}", label=f"{prize[1]} ({(rarities[prize[3]])})", description=f"Buy this for {(prize[3]+1)*500} Tickets")
         shop_menu.add_option(value="1000", label="1000 Tickets | Prize Crate", description="Warning: Content Quality is not Guaranteed.")
         shop_menu.custom_id = time_seed
         embed.set_image(random.choice(shopkeepers))
@@ -230,21 +234,31 @@ class GameStateManager:
         @bot.listen("on_dropdown")
         async def on_prize_select(inter2: disnake.MessageInteraction):
             if inter2.data.custom_id == time_seed:
-                data = inter2.data.values[0]
+                data = int(inter2.data.values[0])
 
-                user_tickets, = db.get_tickets(inter2.author)
+                user_tickets = db.get_tickets(inter2.author)
 
                 if data == 1000:
                     if user_tickets < 1000:
                         await inter2.send(f"You do not have enough tickets to purchase this prize! This prize costs 1000 Tickets, but you've only got {user_tickets}!", ephemeral=True)
                         return
                     else:
-                        db.award_random_prize()
-                        await inter2.send("You have purchased a Loot Box! Inside the loot box you find...") # TODO: Make this actually tell you the prize you won. See issue #12
+                        chance = random.randint(1,20)
+                        if chance <= 7:
+                            rarity = 0
+                        elif chance <= 14:
+                            rarity = 1
+                        elif chance <= 18:
+                            rarity = 2
+                        else:
+                            rarity = 3
+                        prize, = db.award_random_prize(inter.author, "Shop", rarity)
+                        prize_data = db.get_prize(prize)
+                        await inter2.send(f"You have purchased a Loot Box!\nInside the loot box you find a **{rarities[prize_data[3]]}{prize_data[1]}**!\nYou can view your new prize with `/inv`", ephemeral=True)
                 else:
                     prize_list_cur = db.db.execute("select * from prizes")
                     prize_list = prize_list_cur.fetchall()
-                    selected_prize = prize_list[int(data)]
+                    selected_prize = prize_list[data-1]
                     prize_cost = (selected_prize[3]+1)*500
                     if user_tickets < prize_cost:
                         await inter2.send(f"You do not have enough tickets to purchase this prize! This prize costs {prize_cost} Tickets, but you've only got {user_tickets}!", ephemeral=True)
@@ -252,7 +266,31 @@ class GameStateManager:
                     else:
                         db.award_prize(inter2.author, 'Shop', data)
                         db.award_tickets((0-prize_cost), inter2.author, 'Shop')
-                        await inter2.send(f"Congratulations! You have obtained a {rarities[selected_prize[3]]} {selected_prize[1]}!\nYou can view your inventory with `/inv`", ephemeral=True)
+                        await inter2.send(f"Congratulations! You have obtained a {selected_prize[1]}!\nYou can view your inventory with `/inv`", ephemeral=True)
+
+    @bot.slash_command(name="inv", guild_ids=[770428394918641694, 120330239996854274])
+    async def inventory(self, inter: disnake.ApplicationCommandInteraction):
+
+        prizes = db.get_prize_wins_by_user(inter.author)
+        uid = hash(f"{inter.author.id}Inventory{time.time()}{random.randint(0, 1000000)}")
+        current_id = 0
+
+        prize_data = db.get_prize(prizes[current_id])
+        embed = disnake.Embed(title="Inventory Viewer!", description=f"Viewing your {prize_data[1]}")
+        embed.set_image(prize_data[5])
+        message = inter.send(embed=embed, ephemeral=True)
+        @bot.listen("on_button_press")
+        async def inventory_press(inter2: disnake.MessageInteraction):
+            if inter2.data.custom_id.startswith(uid):
+                pass
+
+    @bot.slash_command(name="shutdown", permissions=disnake.Permissions(manage_messages=True))
+    async def shutdown(self, inter):
+        await inter.send("The bot will shut down in 5 Minutes! Any ongoing games will be ended, and your tokens will not be refunded!\nPlease finish any games that you are currently playing!\nNOTE: New Games cannot be started during the shutdown period.")
+        bot.shutdown = True
+        await asyncio.sleep(300)
+        await inter.send("Goodbye!")
+        exit(99)
 
 @web.get("/api/consume_session")
 async def consume_session(session: str):
