@@ -1,0 +1,258 @@
+[
+  {
+    "id": 0,
+    "name": "1 Kromer Bill (Slimy)",
+    "description": "Smells like polyester.",
+    "rarity": "0",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/bill/billCommon.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/bill/billCommon.gif"
+  },
+  {
+    "id": 1,
+    "name": "1 Kromer Bill (Half-Price)",
+    "description": "As seen in the beloved [[citation needed](https://en.wikipedia.org/wiki/Citation_(film))] movie *[SUNDAY, SUNDAY, SOMEDAY!] the 27th Part 4: Spamton Takes Manhettaton.",
+    "rarity": "1",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/bill/billRare.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/bill/billRare.gif"
+  },
+  {
+    "id": 2,
+    "name": "1 Kromer Bill (Specil)",
+    "description": "Useless after the Kromer Krash\u00e2\u201e\u00a2 of 199X.",
+    "rarity": "2",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/bill/billEpic.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/bill/billEpic.gif"
+  },
+  {
+    "id": 3,
+    "name": "1 Kromer Bill [BIG SHOT]",
+    "description": "Did you know that a dollar bill doesn't appreciate in value? Even a classic, out-of print first issue minted 2 dollar US bill is only worth 2 dollars in value. So yeah, this is worth less than the gold it's printed on.",
+    "rarity": "3",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/bill/billLegendary.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/bill/billLegendary.gif"
+  },
+  {
+    "id": 4,
+    "name": "\"N0 REFUNDS\" Sticker (Slimy)",
+    "description": "Smells like cardboard.",
+    "rarity": "0",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/sticker/stickerCommon.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/sticker/stickerCommon.gif"
+  },
+  {
+    "id": 5,
+    "name": "\"N0 REFUNDS\" Sticker (Half-Price)",
+    "description": "It doesn't come off. There's no adhesive on it whatsoever.",
+    "rarity": "1",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/sticker/stickerRare.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/sticker/stickerRare.gif"
+  },
+  {
+    "id": 6,
+    "name": "\"N0 REFUNDS\" Sticker (Specil)",
+    "description": "Is this a characteristic statement from Spamton, or a clarification about the refund policy for the sticker?",
+    "rarity": "2",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/sticker/stickerEpic.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/sticker/stickerEpic.gif"
+  },
+  {
+    "id": 7,
+    "name": "\"N0 REFUNDS\" Sticker [BIG SHOT]",
+    "description": "Make your backpack 0.25 kilograms heavier!",
+    "rarity": "3",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/sticker/stickerLegendary.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/sticker/stickerLegendary.gif"
+  },
+  {
+    "id": 8,
+    "name": "Jevil Keychain (Slimy)",
+    "description": "Smells like silicon.",
+    "rarity": "0",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/keychain/keychainCommon.blend\", \"https://rutdiscord.github.io/halloween2023/final/keychain/keychain.ogg\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/sticker/keychainCommon.mp4"
+  },
+  {
+    "id": 9,
+    "name": "Jevil Keychain (Half-Price)",
+    "description": "Listen to that moldy oldie in glorious Drive-Thru Stereo!",
+    "rarity": "1",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/keychain/keychainRare.blend\", \"https://rutdiscord.github.io/halloween2023/final/keychain/keychain.ogg\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/keychain/keychainRare.mp4"
+  },
+  {
+    "id": 10,
+    "name": "Jevil Keychain (Specil)",
+    "description": "...Except have a sound higher quality than 22100 Hz apparently.",
+    "rarity": "2",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/keychain/keychainEpic.blend\", \"https://rutdiscord.github.io/halloween2023/final/keychain/keychain.ogg\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/keychain/keychainEpic.mp4"
+  },
+  {
+    "id": 11,
+    "name": "Jevil Keychain [BIG SHOT]",
+    "description": "The gold makes the button harder to push.",
+    "rarity": "3",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/keychain/keychainLegendary.blend\", \"https://rutdiscord.github.io/halloween2023/final/keychain/keychain.ogg\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/keychain/keychainLegendary.mp4"
+  },
+  {
+    "id": 12,
+    "name": "Felt Ralsei Wizard Hat (Slimy)",
+    "description": "Smells like moss.",
+    "rarity": "0",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/hat/hatCommon.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/hat/hatCommon.gif"
+  },
+  {
+    "id": 13,
+    "name": "Felt Ralsei Wizard Hat (Half-Price)",
+    "description": "Feels like someone skinned a pool table to make this.",
+    "rarity": "1",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/hat/hatRare.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/hat/hatRare.gif"
+  },
+  {
+    "id": 14,
+    "name": "Felt Ralsei Wizard Hat (Specil)",
+    "description": "Too big for anyone's head.",
+    "rarity": "2",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/hat/hatEpic.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/hat/hatEpic.gif"
+  },
+  {
+    "id": 15,
+    "name": "Felt Ralsei Wizard Hat [BIG SHOT]",
+    "description": "Also makes a great car decoration.",
+    "rarity": "3",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/hat/hatLegendary.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/hat/hatLegendary.gif"
+  },
+  {
+    "id": 16,
+    "name": "Toriel Bookmark (Slimy)",
+    "description": "Smells like the library.",
+    "rarity": "0",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/bookmark/bookmarkCommon.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/bookmark/bookmarkCommon.gif"
+  },
+  {
+    "id": 17,
+    "name": "Toriel Bookmark (Half-Price)",
+    "description": "What constitutes \"bootleg\" in the context of a cardboard bookmark?",
+    "rarity": "1",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/bookmark/bookmarkRare.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/bookmark/bookmarkRare.gif"
+  },
+  {
+    "id": 18,
+    "name": "Toriel Bookmark (Specil)",
+    "description": "At this rate, maybe the whole underground *does* need a basic literacy course.",
+    "rarity": "2",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/bookmark/bookmarkEpic.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/bookmark/bookmarkEpic.gif"
+  },
+  {
+    "id": 19,
+    "name": "Toriel Bookmark [BIG SHOT]",
+    "description": "Shove it halfway through a paperback you've never looked inside before to make your bookcase look legit.",
+    "rarity": "3",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/bookmark/bookmarkLegendary.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/bookmark/bookmarkLegendary.gif"
+  },
+  {
+    "id": 20,
+    "name": "Clump of Snowman Snow (Slimy)",
+    "description": "Smells like water.",
+    "rarity": "0",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/snow/snowCommon.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/snow/snowCommon.gif"
+  },
+  {
+    "id": 21,
+    "name": "Clump of Snowman Snow (Half-Price)",
+    "description": "At least it's not yellow.",
+    "rarity": "1",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/snow/snowRare.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/snow/snowRare.gif"
+  },
+  {
+    "id": 22,
+    "name": "Clump of Snowman Snow (Specil)",
+    "description": "Get it to a freezer sooner rather than later.",
+    "rarity": "2",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/snow/snowEpic.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/snow/snowEpic.gif"
+  },
+  {
+    "id": 23,
+    "name": "Clump of Snowman Snow [BIG SHOT]",
+    "description": "At least it's not y- oh wait.",
+    "rarity": "3",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/snow/snowLegendary.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/snow/snowLegendary.gif"
+  },
+  {
+    "id": 24,
+    "name": "Gyftrot Wrapping Paper (Slimy)",
+    "description": "Smells like holly.",
+    "rarity": "0",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/wrapping_paper/wrapping_paperCommon.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/wrapping_paper/wrapping_paperCommon.gif"
+  },
+  {
+    "id": 25,
+    "name": "Gyftrot Wrapping Paper (Half-Price)",
+    "description": "You could pass those off as part of the design, probably.",
+    "rarity": "1",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/wrapping_paper/wrapping_paperRare.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/wrapping_paper/wrapping_paperRare.gif"
+  },
+  {
+    "id": 26,
+    "name": "Gyftrot Wrapping Paper (Specil)",
+    "description": "***It's OCTOBER.***",
+    "rarity": "2",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/wrapping_paper/wrapping_paperEpic.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/wrapping_paper/wrapping_paperEpic.gif"
+  },
+  {
+    "id": 27,
+    "name": "Gyftrot Wrapping Paper [BIG SHOT]",
+    "description": "On closer inspection, it's made of the same material as chocolate coin wrappers.",
+    "rarity": "3",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/wrapping_paper/wrapping_paperLegendary.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/wrapping_paper/wrapping_paperLegendary.gif"
+  },
+  {
+    "id": 28,
+    "name": "Bootleg Sans Plushie (Slimy)",
+    "description": "Smells like Grandma's house.",
+    "rarity": "0",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/plushie/plushieCommon.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/plushie/plushieCommon.gif"
+  },
+  {
+    "id": 29,
+    "name": "Bootleg Sans Plushie (Half-Price)",
+    "description": "A bootleg of a bootleg?",
+    "rarity": "1",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/plushie/plushieRare.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/plushie/plushieRare.gif"
+  },
+  {
+    "id": 30,
+    "name": "Bootleg Sans Plushie (Specil)",
+    "description": "Officially licensed unlicensed product.",
+    "rarity": "2",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/plushie/plushieEpic.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/plushie/plushieEpic.gif"
+  },
+  {
+    "id": 31,
+    "name": "Bootleg Sans Plushie [BIG SHOT]",
+    "description": "\"Solid Gold\" and \"Plushie\" might be oxymorons.",
+    "rarity": "3",
+    "image": "[\"https://rutdiscord.github.io/halloween2023/final/plushie/plushieLegendary.blend\"]",
+    "preview": "https://rutdiscord.github.io/halloween2023/final/plushie/plushieLegendary.gif"
+  }
+]
