@@ -84,7 +84,6 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
 
     while time < 10:
         time += 1
-        print(time)
         if time < 0:
             embed = disnake.Embed(title="Test Your Strength!",
                                   description=f"Hit as many buttons as possible in the time allotted to win!\nThe game starts in {0-time} Seconds.\n{newline.join(empty_bar)}")

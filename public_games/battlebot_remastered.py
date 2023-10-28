@@ -317,8 +317,9 @@ async def healHandler(interaction):
     return await heal(interaction, hitpoints[interaction.author.id])
 
 
-async def play_game(channel, bot, optional_argument=None):
-    global old_userList, deadlist, old_deadlist, battleOngoing, hitpoints, monster_HP, lastAttacker, userList, turn, loss, dmgDone, fight_average, action_to_process
+async def play_game(channel, bot2, optional_argument=None):
+    global old_userList, deadlist, old_deadlist, battleOngoing, hitpoints, monster_HP, lastAttacker, userList, turn, loss, dmgDone, fight_average, action_to_process, bot
+    bot=bot2
 
     old_deadlist = deadlist
     deadlist = []

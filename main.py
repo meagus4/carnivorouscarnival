@@ -146,7 +146,6 @@ class GameStateManager:
         game_uid = hash(
             f"{inter.author.id}{game_name}{time.time()}{random.randint(0, 1000000)}")
         game_uid += sys.maxsize + 1
-        print("gameuid", game_uid)
 
         member = typing.cast(disnake.Member, inter.author)
 
@@ -229,8 +228,8 @@ class GameStateManager:
         current_prizes.append(random.choice(less_bad_items))
 
         for prize in current_prizes:
-            embed.add_field(name=f"{(prize[3]+1)*500} Tickets | {prize[1]} ({rarities[prize[3]]})", value=prize[2])
-            shop_menu.add_option(value=f"{prize[0]}", label=f"{prize[1]} ({(rarities[prize[3]])})", description=f"Buy this for {(prize[3]+1)*500} Tickets")
+            embed.add_field(name=f"{(prize[3]+1)*500} Tickets | {prize[1]}", value=prize[2])
+            shop_menu.add_option(value=f"{prize[0]}", label=f"{prize[1]}", description=f"Buy this for {(prize[3]+1)*500} Tickets")
         shop_menu.add_option(value="1000", label="1000 Tickets | Prize Crate", description="Warning: Content Quality is not Guaranteed.")
         shop_menu.custom_id = time_seed
         embed.set_image(random.choice(shopkeepers))
@@ -260,7 +259,7 @@ class GameStateManager:
                             rarity = 3
                         prize, = db.award_random_prize(inter.author, "Shop", rarity)
                         prize_data = db.get_prize(prize)
-                        await inter2.send(f"You have purchased a Loot Box!\nInside the loot box you find a **{rarities[prize_data[3]]}{prize_data[1]}**!\nYou can view your new prize with `/inv`", ephemeral=True)
+                        await inter2.send(f"You have purchased a Loot Box!\nInside the loot box you find a **{prize_data[1]}**!\nYou can view your new prize with `/inv`", ephemeral=True)
                 else:
                     prize_list_cur = db.db.execute("select * from prizes")
                     prize_list = prize_list_cur.fetchall()
@@ -275,20 +274,107 @@ class GameStateManager:
                         await inter2.send(f"Congratulations! You have obtained a {selected_prize[1]}!\nYou can view your inventory with `/inv`", ephemeral=True)
 
     @bot.slash_command(name="inv")
-    async def inventory(self, inter: disnake.ApplicationCommandInteraction):
+    async def inventory(self, inter: disnake.ApplicationCommandInteraction, user:disnake.Member = None):
 
-        prizes = db.get_prize_wins_by_user(inter.author)
+        inv_view = user or inter.author
+        async def display_item(prize_dict:dict, embed:disnake.Embed, index):
+
+            item = list(prize_dict.keys())[index]
+            prize_data = db.get_prize(item)
+
+            embed.add_field(name=f"{prize_data[1]}", value=f"*{prize_data[2]}*\nYou have {prize_dict[item]} of these.")
+            embed.set_image(url=prize_data[5])
+            files = json.loads(prize_data[4])
+            actionrow = disnake.ui.ActionRow()
+            for f in files:
+                filetype = f.split(".")
+                actionrow.add_button(label=f".{filetype[-1]}", url=f, style=disnake.ButtonStyle.url)
+            components = [actionrow]
+            return embed, components
+
+        def create_buttons(uid:int, index:int, disable:str | None='left'):
+            large_left = disnake.ui.Button(label='<<', custom_id=f'{uid}-ll', style=disnake.ButtonStyle.green)
+            small_left = disnake.ui.Button(label='<', custom_id=f'{uid}-sl', style=disnake.ButtonStyle.blurple)
+            count = disnake.ui.Button(label=f'{index + 1} / {len(prizes)}', disabled=True, custom_id=f'{uid}-count')
+            small_right = disnake.ui.Button(label='>', custom_id=f'{uid}-sr', style=disnake.ButtonStyle.blurple)
+            large_right = disnake.ui.Button(label='>>', custom_id=f'{uid}-lr', style=disnake.ButtonStyle.green)
+            if disable == 'left':
+                large_left.disabled = True
+                small_left.disabled = True
+            elif disable == 'right':
+                large_right.disabled = True
+                small_right.disabled = True
+            nav_row = disnake.ui.ActionRow()
+            nav_row.append_item(large_left)
+            nav_row.append_item(small_left)
+            nav_row.append_item(count)
+            nav_row.append_item(small_right)
+            nav_row.append_item(large_right)
+            return nav_row
+
         uid = hash(f"{inter.author.id}Inventory{time.time()}{random.randint(0, 1000000)}")
-        current_id = 0
+        uid += sys.maxsize + 1
 
-        prize_data = db.get_prize(prizes[current_id])
-        embed = disnake.Embed(title="Inventory Viewer!", description=f"Viewing your {prize_data[1]}")
-        embed.set_image(prize_data[5])
-        message = inter.send(embed=embed, ephemeral=True)
-        @bot.listen("on_button_press")
+        # Gets Number of Tickets & Tokens and creates an Embed
+        tickets = db.get_tickets(inter.author)
+        tokens = db.get_tokens(inter.author, "private")
+        embed = disnake.Embed(title=f"Displaying {inv_view.name}'s Inventory!", description=f"{inv_view.name} currently has `{tickets}` Tickets and `{tokens}` Play Tokens")
+        components = []
+        index = 0
+
+        # Gets user prize list
+        prizes = db.get_prize_wins_by_user(inv_view)
+        if len(prizes) > 0:
+
+            unique_list = {}
+            for prize in prizes:
+                if prize[2] not in unique_list.keys():
+                    unique_list[prize[2]] = 1
+                else:
+                    unique_list[prize] += 1
+
+            embed, components = await display_item(unique_list, embed, index)
+
+            # Adds Navigation Buttons
+            components.append(create_buttons(uid, index))
+        # Gets user thread
+        existing_thread = db.get_thread_for_user(typing.cast(disnake.Member, inter.author))
+        if existing_thread:
+            pthread = typing.cast(disnake.Thread, await bot.fetch_channel(int(existing_thread)))
+        else:
+            pthread = await gsm.private_game_channel.create_thread(name=f"{inter.author.name}'s game channel", type=disnake.ChannelType.private_thread)
+            db.add_thread_for_user(typing.cast(disnake.Member, inter.author), pthread)
+
+        message = await pthread.send(f"{inter.author.mention}", embed=embed, components=components)
+        await inter.send(f"Inventory has been opened in {pthread.mention}", ephemeral=True)
+
+        @bot.listen("on_button_click")
         async def inventory_press(inter2: disnake.MessageInteraction):
-            if inter2.data.custom_id.startswith(uid):
-                pass
+            nonlocal index, embed, unique_list, components, message, uid
+            if inter2.data.custom_id.startswith(str(uid)):
+                move_type = inter2.data.custom_id.split('-')[1]
+                disable = None
+                if move_type == 'll':
+                    index -= 5
+                elif move_type == 'sl':
+                    index -= 1
+                elif move_type == 'lr':
+                    index += 5
+                elif move_type == 'sr':
+                    index += 1
+                if index <= 0:
+                    index = 0
+                    disable = 'left'
+                elif index + 1 >= len(prizes):
+                    index = len(prizes)-1
+                    disable = 'right'
+
+
+            embed.clear_fields()
+            embed, components = await display_item(unique_list, embed, index)
+            components.append(create_buttons(uid, index, disable))
+            await message.edit(embed=embed, components=components)
+            await inter2.send("Page updated!", ephemeral=True)
 
     @bot.slash_command(name="shutdown", permissions=disnake.Permissions(manage_messages=True))
     async def shutdown(self, inter):
