@@ -9,6 +9,7 @@ import random
 from config import load_config
 import fastapi
 from fastapi import responses
+from fastapi.middleware.cors import CORSMiddleware
 import asyncio
 import database
 db = database.Database()
@@ -28,12 +29,25 @@ intents: disnake.Intents = disnake.Intents(
 bot = Bot(command_prefix=when_mentioned, intents=intents)
 gsm = None
 config = load_config()
+
 bot.shutdown = False
+
+CORS_ORIGINS = config["cors_origins"]
+# this might error if this is empty. Too bad!
+
 docs = True
 if docs:
     web = fastapi.FastAPI()
 else:
     web = fastapi.FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+
+web.add_middleware(
+    CORSMiddleware,
+    allow_origins=CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 @bot.event
 async def on_ready():
@@ -134,6 +148,8 @@ class GameStateManager:
         game_uid += sys.maxsize + 1
         print("gameuid", game_uid)
 
+        member = typing.cast(disnake.Member, inter.author)
+
         if parent_channel_id != self.private_game_channel.id:
             return await inter.send(f"You can only play games in {self.private_game_channel.mention}.", ephemeral=True)
 
@@ -141,16 +157,21 @@ class GameStateManager:
             buf = "Please select a valid game. Games include:\n"
             buf += "\n".join(self.private_game_list.keys())
             return await inter.send(buf, ephemeral=True)
+        
+        tokens = db.get_tokens(member,"private")
+        if tokens <= 0:
+            return await inter.send("Sorry, you're out of tokens! (Tokens return to you 3 hours after you use them)", ephemeral=True) 
 
         pthread = inter.channel if isinstance(inter.channel, disnake.Thread) else await self.private_game_channel.create_thread(name=game_name, type=disnake.ChannelType.private_thread)
-
+    
         if in_thread:
-            await inter.send(f"Starting {game_name}...")
+            await inter.send(f"Starting {game_name}...\n You have {tokens} tokens left.")
         else:
             await pthread.send(f"Starting {game_name}... {inter.author.mention}")
-            await inter.send(f"Check {pthread.mention}", ephemeral=True)
+            await inter.send(f"Check {pthread.mention}. You have {tokens} tokens left.", ephemeral=True)
 
         game = self.private_game_list[game_name]
+        db.consume_tokens(1, member,game_name, "private")
         await game(pthread, typing.cast(disnake.Member, inter.author), bot, str(game_uid), optional_argument)
 
     @bot.slash_command(name="shop", guild_ids=[770428394918641694, 120330239996854274])
@@ -172,11 +193,11 @@ class GameStateManager:
         ]
 
         # Gets All Shop Items (Rarity 0)
-        bad_items_cur = db2.db.execute("select * from prizes where rarity = 0")
+        bad_items_cur = db.db.execute("select * from prizes where rarity = 0")
         bad_items = bad_items_cur.fetchall()
 
         # Gets All Shop Items (Rarity 1)
-        less_bad_items_cur = db2.db.execute("select * from prizes where rarity = 1")
+        less_bad_items_cur = db.db.execute("select * from prizes where rarity = 1")
         less_bad_items = less_bad_items_cur.fetchall()
 
         # Gets the current random seed for this user.
@@ -235,7 +256,7 @@ class GameStateManager:
                         prize_data = db.get_prize(prize)
                         await inter2.send(f"You have purchased a Loot Box!\nInside the loot box you find a **{rarities[prize_data[3]]}{prize_data[1]}**!\nYou can view your new prize with `/inv`", ephemeral=True)
                 else:
-                    prize_list_cur = db2.db.execute("select * from prizes")
+                    prize_list_cur = db.db.execute("select * from prizes")
                     prize_list = prize_list_cur.fetchall()
                     selected_prize = prize_list[data-1]
                     prize_cost = (selected_prize[3]+1)*500
@@ -286,9 +307,24 @@ async def submit_session(session: str, game_name: str, score: str):
     """
     Submit a completed game using your session token. Games can be submitted *once*.
     """
-    print("session: ", session, "\ngame_name: ", game_name, "\nscore: ", score)
-    #TODO FIX
-    return {"submitted": True}
+    # i don't know why we validate the token in this module for the
+    # function immediately above, but for submitting game results the validation
+    # is already baked into the DB validation method in the other module.
+    # 2 am programming, i guess.
+
+    valid, reason = db.submit_game_results(session, int(score))
+
+    token = tokentools.decrypt_token(session)
+
+    tickets = 0
+    if valid:
+        try:
+            user = await bot.get_or_fetch_user(token['user']['id'])
+        except:
+            return responses.JSONResponse({"valid": False, "reason": "Discord: Unable to fetch user"}, status_code=400)
+        db.award_tickets(int(score), typing.cast(disnake.Member,user), game_name)
+        tickets = db.get_tickets(typing.cast(disnake.Member,user))
+    return responses.JSONResponse({"valid" : valid, "reason": reason,"tickets": tickets}, status_code=200 if valid else 400)
 
 
 if __name__ == '__main__':

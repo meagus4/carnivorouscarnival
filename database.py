@@ -29,12 +29,13 @@ class Database:
     def award_tickets(self, count: int, user: disnake.Member, game: str) -> None:
         self.db.execute("INSERT INTO ticket_wins (user, game, ticket_change) VALUES (?, ?, ?)", (user.id, game, count))
         self.db.commit()
-    def consume_tokens(self, count: int, user: disnake.Member, game: str, token_type: str) -> None:
+    def consume_tokens(self, count: int, user: disnake.Member, game: str, token_type: typing.Literal["public","private"]) -> None:
         self.db.execute("INSERT INTO consumed_tokens (token_type, user, game, token_change) VALUES (?,?, ?, ?)", (token_type, user.id, game, count))
         self.db.commit()
-    def get_used_tokens(self, user: disnake.Member, hours: int = default_bucket_hours) -> int:
+    def get_tokens(self, user: disnake.Member, token_type: typing.Literal["public","private"], hours: int = default_bucket_hours) -> int:
         cur = self.db.execute("SELECT sum(token_change) FROM consumed_tokens WHERE user = ? and datetime > datetime('now', ?)", (user.id, f"{-hours} hour"))
-        return cur.fetchall()[0]
+        res = cur.fetchall()[0][0] or 0
+        return 9 - res
     def award_prize(self, user: disnake.Member, game: str, prize: int) -> None:
         self.db.execute("INSERT INTO prize_wins (user, game, prize) VALUES (?, ?, ?)", (user.id, game, prize))
         self.db.commit()
@@ -62,7 +63,7 @@ class Database:
             return False
         #Burn token
         time_played = datetime.datetime.now()
-        self.db.execute("UPDATE web_game_sessions SET status = 1, time_played = ?, session_token = ? and status = 0", (time_played, token))
+        self.db.execute("UPDATE web_game_sessions SET status = 1, time_played = ? WHERE session_token = ? and status = 0", (time_played, token))
         self.db.commit()
         return True
     def submit_game_results(self, token: str, points: int) -> tuple[bool, str]:
@@ -75,7 +76,7 @@ class Database:
         if len(res) == 0:
             return False, "Invalid Token"
         time_finished = datetime.datetime.now()
-        self.db.execute("UPDATE web_game_sessions SET status = 2 and points = ? and time_finished = ? WHERE session_token = ? and status = 1", (points, time_finished, token))
+        self.db.execute("UPDATE web_game_sessions SET status = 2, points = ?, time_finished = ? WHERE session_token = ? and status = 1", (points, time_finished, token))
         self.db.commit()
         return True, "Valid."
     def get_prize(self, id: int):
