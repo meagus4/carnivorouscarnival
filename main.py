@@ -1,8 +1,6 @@
 import datetime
-import importlib
 import json
 import math
-import os
 import sys
 import time
 import typing
@@ -121,7 +119,6 @@ class GameStateManager:
         # Ugliest bodge I've ever written, please fix
         # it's needed here too. i hate it. -bliv
         self = typing.cast(GameStateManager, gsm)
-
         await self._start_new_public_game(game_name, optional_argument)
         await inter.send("Started the requested game.", ephemeral=True)
 
