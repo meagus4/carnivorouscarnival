@@ -20,7 +20,9 @@ class Database:
     def __init__(self) -> None:
         if not os.path.exists(db_filename):
             make_database(db_filename)
+        prize_setup(db_filename)
         self.db = sqlite3.connect(db_filename)
+
     def get_tickets(self, user: disnake.Member) -> int:
         res, = self.db.execute("SELECT sum(ticket_change) FROM ticket_wins WHERE user = ?", (user.id,)).fetchone()
         return res if res else 0
@@ -107,16 +109,23 @@ class Database:
         self.db.commit()
 
     # Sets up the Prize Database from store.json
-    def prize_setup(self):
-        with open('store.json', 'r') as file:
-            raw_data = json.load(file)
-        current_prizes = self.get_all_prizes()
-        for d in raw_data:
-            for v in raw_data[d]:
-                r = raw_data[d][v]
-                if r['name'] not in current_prizes:
-                    self.add_new_prize(name=r['name'], description=r['description'], image=json.dumps(r['download']), preview=r['preview'], rarity=int(v))
-
+    # This fucking code. DID NOT. Work. NO matter what we did.
+    # The database was ALWAYS locked.
+    # After an hour of troubleshooting, I said "fuck it" and asked ChatGPT to try and fix it instead
+    # ChatGPT changed it from 'db = sqlite3.connect(file)' to 'with sqlite3.connect(file) as db:' IN THEORY, this should be identical to what we already did.
+    # I have no fucking idea why that worked. But it did. So I am documenting my insanity here.
+def prize_setup(file: str):
+    try:
+        with sqlite3.connect(file) as db:
+            with open('store.json', 'r') as file:
+                raw_data = json.load(file)
+            cur = db.cursor()
+            cur.execute("DELETE FROM prizes")
+            for prize in raw_data:
+                db.execute("INSERT INTO prizes (id, name, description, rarity, image, preview) VALUES (?, ?, ?, ?, ?, ?)",
+                           (prize['id'], prize['name'], prize['description'], prize['rarity'], prize['image'], prize['preview']))
+    except sqlite3.OperationalError as e:
+        print(f"Error in prize_setup: {e}")
 def make_database(file: str):
     schema = open("schema.sql").read()
     db = sqlite3.connect(file)

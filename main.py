@@ -43,7 +43,6 @@ async def on_ready():
     gsm = GameStateManager(_public, _private)
     gsm.start_timed_new_public_game.start()
     print("Ready!")
-    prize_setup()
 
 # Load games
 public_game_list: PublicGameList = load_public_games()
@@ -81,7 +80,7 @@ class GameStateManager:
         game = self.public_game_list[game_name]
         await game(target_channel, bot, optional_argument)
 
-    @bot.slash_command(name="play_public", permissions=disnake.Permissions(manage_messages=True))
+    @bot.slash_command(name="play_public", permissions=disnake.Permissions(manage_messages=True), guild_ids=[770428394918641694, 120330239996854274])
     async def start_new_public_game(
             self,
             inter: disnake.ApplicationCommandInteraction | None,
@@ -101,7 +100,7 @@ class GameStateManager:
     async def start_timed_new_public_game(self):
         await self._start_new_public_game()
 
-    @bot.slash_command(name="play")
+    @bot.slash_command(name="play", guild_ids=[770428394918641694, 120330239996854274])
     async def start_new_private_game(
             self,
             inter: disnake.ApplicationCommandInteraction,
@@ -154,7 +153,7 @@ class GameStateManager:
         game = self.private_game_list[game_name]
         await game(pthread, typing.cast(disnake.Member, inter.author), bot, str(game_uid), optional_argument)
 
-    @bot.slash_command(name="shop")
+    @bot.slash_command(name="shop", guild_ids=[770428394918641694, 120330239996854274])
     async def shop(self, inter: disnake.ApplicationCommandInteraction):
 
         from database import Database
@@ -246,9 +245,9 @@ class GameStateManager:
                     else:
                         db.award_prize(inter2.author, 'Shop', data)
                         db.award_tickets((0-prize_cost), inter2.author, 'Shop')
-                        await inter2.send(f"Congratulations! You have obtained a {rarities[selected_prize[3]]} {selected_prize[1]}!\nYou can view your inventory with `/inv`", ephemeral=True)
+                        await inter2.send(f"Congratulations! You have obtained a {selected_prize[1]}!\nYou can view your inventory with `/inv`", ephemeral=True)
 
-    @bot.slash_command(name="inv")
+    @bot.slash_command(name="inv", guild_ids=[770428394918641694, 120330239996854274])
     async def inventory(self, inter: disnake.ApplicationCommandInteraction):
 
         prizes = db.get_prize_wins_by_user(inter.author)
@@ -257,6 +256,8 @@ class GameStateManager:
 
         prize_data = db.get_prize(prizes[current_id])
         embed = disnake.Embed(title="Inventory Viewer!", description=f"Viewing your {prize_data[1]}")
+        embed.set_image(prize_data[5])
+        message = inter.send(embed=embed, ephemeral=True)
         @bot.listen("on_button_press")
         async def inventory_press(inter2: disnake.MessageInteraction):
             if inter2.data.custom_id.startswith(uid):
