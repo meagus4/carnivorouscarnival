@@ -1,3 +1,4 @@
+import json
 import sqlite3
 import typing
 import os
@@ -77,6 +78,23 @@ class Database:
         return True, "Valid."
     def get_prize(self, id: int):
         return self.db.execute("select * from prizes where id = ?", (id,)).fetchall()[0]
+
+    def get_prize_wins_by_user(self, member: disnake.Member):
+        return self.db.execute("select * from prize_wins where user = ?", (member.id,)).fetchall()
+
+    def get_all_prizes(self):
+        name_list = self.db.execute("select name from prizes").fetchall()
+        final_list = []
+        for n in name_list:
+            t, = n
+            final_list.append(t)
+        return final_list
+
+    def add_new_prize(self, name, description, rarity, image, preview):
+        self.db.execute("INSERT INTO prizes (name, description, rarity, image) VALUES (?, ?, ?, ?)", (name, description, rarity, image, preview))
+        self.db.commit()
+        return
+
     def get_game_data(self, game:str, user: disnake.Member):
         return self.db.execute("select data from game_data where game = ? and user = ?", (game, user.id)).fetchone()
     def set_game_data(self, game: str, user:disnake.Member, data: str) -> None:
@@ -87,6 +105,17 @@ class Database:
         else:
             self.db.execute("INSERT INTO game_data (game, user, data) VALUES (?, ?, ?)", (game, user.id, data))
         self.db.commit()
+
+    # Sets up the Prize Database from store.json
+    def prize_setup(self):
+        with open('store.json', 'r') as file:
+            raw_data = json.load(file)
+        current_prizes = self.get_all_prizes()
+        for d in raw_data:
+            for v in raw_data[d]:
+                r = raw_data[d][v]
+                if r['name'] not in current_prizes:
+                    self.add_new_prize(name=r['name'], description=r['description'], image=json.dumps(r['download']), preview=r['preview'], rarity=int(v))
 
 def make_database(file: str):
     schema = open("schema.sql").read()

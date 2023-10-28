@@ -10,5 +10,9 @@ PrivateGame = typing.Callable[
         str,  # uid - uid
         typing.Optional[str],  # optional - Optional arguments
     ], typing.Coroutine]
-PublicGame = typing.Callable[[disnake.TextChannel,
-                              typing.Optional[str]], typing.Coroutine]
+PublicGame = typing.Callable[
+    [
+        disnake.TextChannel,
+        disnake.ext.commands.Bot,
+        typing.Optional[str]
+    ], typing.Coroutine]
