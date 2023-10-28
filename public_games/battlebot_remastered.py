@@ -355,6 +355,8 @@ async def play_game(channel, bot2, optional_argument=None):
     if mname == 'Sans':
         monster_HP_MAX = 1
 
+    monster_HP_MAX = 250
+
     monster_HP = monster_HP_MAX
     turnTime = 60
     battleTime = int(time.time())
@@ -536,10 +538,7 @@ async def play_game(channel, bot2, optional_argument=None):
         fight_average.append(1)
         msg = f"{mname} was defeated!"
         vEmbed = await newEmbed(msg, monster, 0, 0, monster_HP_MAX, actions=False)
-        reg_c = random.randrange(100, 450)
-
-        dmg_c = random.randrange(90, 400)
-        dmg_r = random.randrange(2, 4)
+        reg_c = random.randrange(300, 650)
 
         bestAttacker = None
         tmpDMG = 0
@@ -551,8 +550,19 @@ async def play_game(channel, bot2, optional_argument=None):
 
         if tmpUSR != 0:
             user = await bot.get_or_fetch_user(lastAttacker)
+            user2 = await bot.get_or_fetch_user(tmpUSR)
+
+            draw = random.randint(1, 10)
+            if draw <= 4:
+                prize, = db.award_random_prize(user2, "Battlebot", 1)
+            elif draw <= 9:
+                prize, = db.award_random_prize(user2, "Battlebot", 2)
+            else:
+                prize, = db.award_random_prize(user2, "Battlebot", 3)
+            prize_data = db.get_prize(prize)
+
             vEmbed.add_field(name='Monster Defeated',
-                             value=f'{user.name} got the final hit! They have been awarded {reg_c} Tickets!\n{user} did the most damage, with {tmpDMG} damage! They have been awarded {dmg_c} Tickets', inline=False)
+                                value=f'{user.name} got the final hit! They have been awarded {reg_c} Tickets!\n{user2} did the most damage, with {tmpDMG} damage! They have been awarded with a {prize_data[1]}', inline=False)
         else:
             user = await bot.get_or_fetch_user(lastAttacker)
             vEmbed.add_field(name='Monster Defeated',
@@ -560,8 +570,6 @@ async def play_game(channel, bot2, optional_argument=None):
                              inline=False)
         loss = False
         addCandies(user, reg_c)
-        if tmpUSR != 0:
-            addCandies(user, dmg_c)
     else:
         fight_average.append(0)
         msg = f"{mname} got away!"

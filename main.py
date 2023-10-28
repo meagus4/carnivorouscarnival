@@ -88,6 +88,9 @@ class GameStateManager:
         self.private_game_channel = typing.cast(disnake.TextChannel, _private)
 
     async def _start_new_public_game(self, game_name: str | None = None, optional_argument: str | None = None):
+        # Prevents new games being started if Shutdown mode is enabled.
+        if bot.shutdown:
+            return
         target_channel = self.public_game_channel
         if game_name == None or game_name not in self.public_game_list:
             game_name = random.choice(list(self.public_game_list.keys()))
@@ -109,6 +112,11 @@ class GameStateManager:
         game_name: The game to start.
         optional_argument: An optional argument to pass to the game.
         """
+
+        # Prevents new games being started if Shutdown mode is enabled.
+        if bot.shutdown:
+            await inter.send("The bot is in a Shutdown state, new games cannot be started!", ephemeral=True)
+            return
 
         # Ugliest bodge I've ever written, please fix
         # it's needed here too. i hate it. -bliv
@@ -299,7 +307,7 @@ class GameStateManager:
         def create_buttons(uid:int, index:int, disable:str | None='left'):
             large_left = disnake.ui.Button(label='<<', custom_id=f'{uid}-ll', style=disnake.ButtonStyle.green)
             small_left = disnake.ui.Button(label='<', custom_id=f'{uid}-sl', style=disnake.ButtonStyle.blurple)
-            count = disnake.ui.Button(label=f'{index + 1} / {len(prizes)}', disabled=True, custom_id=f'{uid}-count')
+            count = disnake.ui.Button(label=f'{index + 1} / {len(unique_list)}', disabled=True, custom_id=f'{uid}-count')
             small_right = disnake.ui.Button(label='>', custom_id=f'{uid}-sr', style=disnake.ButtonStyle.blurple)
             large_right = disnake.ui.Button(label='>>', custom_id=f'{uid}-lr', style=disnake.ButtonStyle.green)
             if disable == 'left':
@@ -320,8 +328,8 @@ class GameStateManager:
         uid += sys.maxsize + 1
 
         # Gets Number of Tickets & Tokens and creates an Embed
-        tickets = db.get_tickets(inter.author)
-        tokens = db.get_tokens(inter.author, "private")
+        tickets = db.get_tickets(inv_view)
+        tokens = db.get_tokens(inv_view, "private")
         embed = disnake.Embed(title=f"Displaying {inv_view.name}'s Inventory!", description=f"{inv_view.name} currently has `{tickets}` Tickets and `{tokens}` Play Tokens")
         components = []
         index = 0
@@ -335,7 +343,7 @@ class GameStateManager:
                 if prize[2] not in unique_list.keys():
                     unique_list[prize[2]] = 1
                 else:
-                    unique_list[prize] += 1
+                    unique_list[prize[2]] += 1
 
             embed, components = await display_item(unique_list, embed, index)
 
@@ -369,16 +377,16 @@ class GameStateManager:
                 if index <= 0:
                     index = 0
                     disable = 'left'
-                elif index + 1 >= len(prizes):
-                    index = len(prizes)-1
+                elif index + 1 >= len(unique_list):
+                    index = len(unique_list)-1
                     disable = 'right'
 
-
-            embed.clear_fields()
-            embed, components = await display_item(unique_list, embed, index)
-            components.append(create_buttons(uid, index, disable))
-            await message.edit(embed=embed, components=components)
-            await inter2.send("Page updated!", ephemeral=True)
+                embed.clear_fields()
+                embed, components = await display_item(unique_list, embed, index)
+                components.append(create_buttons(uid, index, disable))
+                await message.edit(embed=embed, components=components)
+                to_del = await inter2.send("Page updated!")
+                await to_del.delete()
 
     @bot.slash_command(name="shutdown", permissions=disnake.Permissions(manage_messages=True))
     async def shutdown(self, inter):

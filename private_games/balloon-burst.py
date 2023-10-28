@@ -153,22 +153,15 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
                 win_text = f"\nThe balloon has burst! You earned 1750 Tickets! You now have {db.get_tickets(member)} Tickets."
                 if random.randint(1, 2) == 1:
 
-                    rarities = {
-                        0: "Common",
-                        1: "Rare",
-                        2: "Medium-Rare",
-                        3: "Well-Done"
-                    }
-
                     draw = random.randint(1, 10)
                     if draw <= 2:
-                        prize = db.award_random_prize(member, "Balloon", 1)
+                        prize, = db.award_random_prize(member, "Balloon", 1)
                     elif draw <= 7:
-                        prize = db.award_random_prize(member, "Balloon", 2)
+                        prize, = db.award_random_prize(member, "Balloon", 2)
                     else:
                         prize, = db.award_random_prize(member, "Balloon", 3)
                     prize_data = db.get_prize(prize)
-                    win_text += f"\nWow! You won a {rarities[prize_data[3]]} {prize_data[1]}! You can view your prizes with `/inv`"
+                    win_text += f"\nWow! You won a {prize_data[1]}! You can view your prizes with `/inv`"
                 spin_button = []
                 attempts = 0
             elif attempts == 0:
