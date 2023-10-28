@@ -75,7 +75,9 @@ class BingoSession:
         embed.add_field(name="Current player count:", value="0", inline=False)
         embed.add_field(name="Number of played emojis:",
                         value="0", inline=False)
+
         embed.add_field(name="Track your emojis from your card here:",value="||✅|| ||✅|| ||✅|| ||✅|| ||✅||\n\n"*5)
+
         salt = self.buttonsalt
         message = await channel.send(
             embed=embed,
