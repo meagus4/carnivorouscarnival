@@ -5,8 +5,10 @@ import random
 import typing
 import string
 import datetime
+import database
+db = database.Database()
 
-emojimap = "😀😄😁😆😅🤣😂🙂🙃😉😇🥰🤩😗🥲😋🤪🤑🤗🫢🤫🫡🤐🤨😑😏😒😬🤥🤤😴😷🤒🥴🤯🤠🥳🥸😎🧐😟😮😳🥺😨😭😱😖😤😡😈💀🤡👺👻👽👾🤖😺😹😼🙀🙈🙉🙊💢💫🎂🩷🧡💛💚💙💜🥚"
+emojimap = "🆓😀😄😁😆😅🤣😂🙂🙃😉😇🥰🤩😗🥲😋🤪🤑🤗🫢🤫🫡🤐🤨😑😏😒😬🤥🤤😴😷🤒🥴🤯🤠🥳🥸😎🧐😟😮😳🥺😨😭😱😖😤😡😈💀🤡👺👻👽👾🤖😺😹😼🙀🙈🙉🙊💢💫🎂🥚🧡💛💚💙💜"
 game_delay = 300
 seconds_per_turn = 20
 
@@ -25,7 +27,7 @@ def fmt_emojiboard(board: list[int]) -> str:
 
 class BingoSession:
     balls = 75
-    played_balls = []
+    played_balls = [0]
     boards: dict[disnake.Member, list[int]] = {}
     timeouts: dict[disnake.Member, datetime.datetime] = []
     won = False
@@ -39,11 +41,12 @@ class BingoSession:
     def generate_board(self, player: disnake.Member) -> list:
         board = []
         for i in range(25):
-            number = random.randrange(0, self.balls)
+            number = random.randrange(1, self.balls)
             while number in board:
                 number = random.randrange(0, self.balls)
             board.append(number)
         self.boards[player] = board
+        board[12] = 0
         return board
 
     def play_ball(self):
@@ -71,6 +74,7 @@ class BingoSession:
         embed.add_field(name="Current player count:", value="0", inline=False)
         embed.add_field(name="Number of played emojis:",
                         value="0", inline=False)
+        embed.add_field(name="Track your emojis here:",value="||✅|| ||✅|| ||✅|| ||✅|| ||✅||\n\n"*5)
         salt = self.buttonsalt
         message = await channel.send(
             embed=embed,
@@ -184,8 +188,9 @@ async def play_game(channel: disnake.TextChannel, bot: disnake.ext.commands.Bot,
             if won:
                 await channel.send(f"{player.mention} won the game by completing: \"{bingo_type}\"!")
                 session.game_embed.set_field_at(
-                    0, name="Current number", value=f"The game has ended.{player.mention} won.")
+                    0, name="Current number", value=f"The game has ended.{player.mention} won 500 tickets.")
                 session.won = True
+                db.award_tickets(500, player, "Bingo")
             else:
                 await interaction.send("You didn't have a bingo! You've been prevented from calling \"Bingo\" for two minutes", ephemeral=True)
                 session.timeouts[player] = datetime.datetime.now(
