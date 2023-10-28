@@ -94,7 +94,7 @@ class GameStateManager:
         game = self.public_game_list[game_name]
         await game(target_channel, bot, optional_argument)
 
-    @bot.slash_command(name="play_public", permissions=disnake.Permissions(manage_messages=True), guild_ids=[770428394918641694, 120330239996854274])
+    @bot.slash_command(name="play_public", permissions=disnake.Permissions(manage_messages=True))
     async def start_new_public_game(
             self,
             inter: disnake.ApplicationCommandInteraction | None,
@@ -114,7 +114,7 @@ class GameStateManager:
     async def start_timed_new_public_game(self):
         await self._start_new_public_game()
 
-    @bot.slash_command(name="play", guild_ids=[770428394918641694, 120330239996854274])
+    @bot.slash_command(name="play")
     async def start_new_private_game(
             self,
             inter: disnake.ApplicationCommandInteraction,
@@ -162,8 +162,14 @@ class GameStateManager:
         if tokens <= 0:
             return await inter.send("Sorry, you're out of tokens! (Tokens return to you 3 hours after you use them)", ephemeral=True) 
 
-        pthread = inter.channel if isinstance(inter.channel, disnake.Thread) else await self.private_game_channel.create_thread(name=game_name, type=disnake.ChannelType.private_thread)
-    
+        existing_thread = db.get_thread_for_user(typing.cast(disnake.Member, inter.author))
+        if existing_thread:
+            pthread = typing.cast(disnake.Thread, await bot.fetch_channel(int(existing_thread)))
+        else:
+            pthread = await self.private_game_channel.create_thread(name=f"{inter.author.name}'s game channel", type=disnake.ChannelType.private_thread)
+            db.add_thread_for_user(typing.cast(disnake.Member, inter.author), pthread)
+
+
         if in_thread:
             await inter.send(f"Starting {game_name}...\n You have {tokens} tokens left.")
         else:
@@ -174,7 +180,7 @@ class GameStateManager:
         db.consume_tokens(1, member,game_name, "private")
         await game(pthread, typing.cast(disnake.Member, inter.author), bot, str(game_uid), optional_argument)
 
-    @bot.slash_command(name="shop", guild_ids=[770428394918641694, 120330239996854274])
+    @bot.slash_command(name="shop")
     async def shop(self, inter: disnake.ApplicationCommandInteraction):
 
         from database import Database
@@ -268,7 +274,7 @@ class GameStateManager:
                         db.award_tickets((0-prize_cost), inter2.author, 'Shop')
                         await inter2.send(f"Congratulations! You have obtained a {selected_prize[1]}!\nYou can view your inventory with `/inv`", ephemeral=True)
 
-    @bot.slash_command(name="inv", guild_ids=[770428394918641694, 120330239996854274])
+    @bot.slash_command(name="inv")
     async def inventory(self, inter: disnake.ApplicationCommandInteraction):
 
         prizes = db.get_prize_wins_by_user(inter.author)

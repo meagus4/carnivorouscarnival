@@ -34,8 +34,8 @@ CREATE TABLE prizes (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL,
   description TEXT NOT NULL,
-  rarity INTEGER NOT NULL, -- maybe?
-  image TEXT, -- maybe?
+  rarity INTEGER NOT NULL,
+  image TEXT,
   preview TEXT
 );
 
@@ -43,4 +43,9 @@ CREATE TABLE game_data (
   game TEXT NOT NULL,
   user TEXT NOT NULL,
   data TEXT
+);
+
+CREATE TABLE threads (
+  user text not null,
+  thread text not null
 );
