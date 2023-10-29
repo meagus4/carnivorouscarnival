@@ -239,7 +239,7 @@ class GameStateManager:
             shop_menu.add_option(value=f"{prize[0]}", label=f"{prize[1]}", description=f"Buy this for {(prize[3]+1)*500} Tickets")
         shop_menu.add_option(value="1000", label="1000 Tickets | Prize Crate", description="Warning: Content Quality is not Guaranteed.")
         shop_menu.custom_id = time_seed
-        embed.set_image(random.choice(shopkeepers))
+        embed.set_thumbnail(random.choice(shopkeepers))
         random.seed(hash(time.time()))
         await inter.send(embed=embed, ephemeral=True, components=shop_menu)
 
@@ -384,9 +384,7 @@ class GameStateManager:
                 embed.clear_fields()
                 embed, components = await display_item(unique_list, embed, index)
                 components.append(create_buttons(uid, index, disable))
-                await message.edit(embed=embed, components=components)
-                to_del = await inter2.send("Page updated!")
-                await to_del.delete()
+                await inter2.response.edit_message(embed=embed, components=components)
 
     @bot.slash_command(name="shutdown", permissions=disnake.Permissions(manage_messages=True))
     async def shutdown(self, inter):
