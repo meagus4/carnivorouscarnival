@@ -409,7 +409,7 @@ class GameStateManager:
         return await inter.send(buf, ephemeral=True)
     
     @bot.slash_command(name="modify_tokens")
-    @commands.default_member_permissions(manage_messages=True)
+    @commands.default_member_permissions(manage_messages=True) # perms fixed
     async def modify_tokens(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member, token_adjustment: int):
         """
         Adjusts a player's token balance for 3 hours.
