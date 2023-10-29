@@ -16,6 +16,7 @@ import idtools
 tokentools = idtools.Token()
 from carnival_types import *
 from disnake.ext.commands import Bot, when_mentioned, option_enum
+from disnake.ext import commands
 import disnake.ext.tasks as tasks
 import random
 
@@ -96,7 +97,8 @@ class GameStateManager:
         game = self.public_game_list[game_name]
         await game(target_channel, bot, optional_argument)
 
-    @bot.slash_command(name="play_public", permissions=disnake.Permissions(manage_messages=True))
+    @bot.slash_command(name="play_public")
+    @commands.default_member_permissions(manage_messages=True)
     async def start_new_public_game(
             self,
             inter: disnake.ApplicationCommandInteraction | None,
@@ -385,7 +387,8 @@ class GameStateManager:
                 to_del = await inter2.send("Page updated!")
                 await to_del.delete()
 
-    @bot.slash_command(name="shutdown", permissions=disnake.Permissions(manage_messages=True))
+    @bot.slash_command(name="shutdown")
+    @commands.default_member_permissions(manage_messages=True)
     async def shutdown(self, inter):
         await inter.send("The bot will shut down in 5 Minutes! Any ongoing games will be ended, and your tokens will not be refunded!\nPlease finish any games that you are currently playing!\nNOTE: New Games cannot be started during the shutdown period.")
         bot.shutdown = True
@@ -405,7 +408,8 @@ class GameStateManager:
             buf += f'''Game name: **{t[0]}**, Tokens consumed to play: **{t[1]}**, Consumed at: {disnake.utils.format_dt(ts)}\n'''
         return await inter.send(buf, ephemeral=True)
     
-    @bot.slash_command(name="modify_tokens", permissions=disnake.Permissions(manage_messages=True))
+    @bot.slash_command(name="modify_tokens")
+    @commands.default_member_permissions(manage_messages=True)
     async def modify_tokens(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member, token_adjustment: int):
         """
         Adjusts a player's token balance for 3 hours.
