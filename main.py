@@ -34,7 +34,7 @@ bot.shutdown = False
 CORS_ORIGINS = config["cors_origins"]
 # this might error if this is empty. Too bad!
 
-docs = True
+docs = False
 if docs:
     web = fastapi.FastAPI()
 else:
