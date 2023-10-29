@@ -170,11 +170,14 @@ def prize_setup(file: str):
                 raw_data = json.load(file)
             cur = db.cursor()
             cur.execute("DELETE FROM prizes")
-            for prize in raw_data:
-                db.execute("INSERT INTO prizes (id, name, description, rarity, image, preview) VALUES (?, ?, ?, ?, ?, ?)",
-                           (prize['id'], prize['name'], prize['description'], prize['rarity'], prize['image'], prize['preview']))
+            for name in raw_data:
+                for rarity in raw_data[name]:
+                    p = raw_data[name][rarity]
+                    db.execute("INSERT INTO prizes (name, description, rarity, image, preview) VALUES (?, ?, ?, ?, ?)",
+                               (p['name'], p['description'], rarity, p['download'][0], p['preview']))
     except sqlite3.OperationalError as e:
         print(f"Error in prize_setup: {e}")
+
 def make_database(file: str):
     schema = open("schema.sql").read()
     db = sqlite3.connect(file)
