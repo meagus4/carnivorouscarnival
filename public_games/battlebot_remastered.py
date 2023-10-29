@@ -178,7 +178,7 @@ def getFlavour(monster):
         f'{monster} thinks you\'re just playing!',
         f'{monster} chose trick!',
         f'{monster} hurls garbage at you!',
-        f'{monster} comes back again!'
+        f'{monster} comes back again!',
         f'{monster} is out of ideas!'
     ]
 
@@ -503,7 +503,7 @@ async def play_game(channel, bot2, optional_argument=None):
                     t_dmg = t_dmg + hitpoints[t_attacked]
                     hitpoints[t_attacked] = 0
                 user = await bot.get_or_fetch_user(t_attacked)
-                attackstring = f'{attackstring}{await user.name} for {t_dmg} Damage!\n'
+                attackstring = f'{attackstring}{user.name} for {t_dmg} Damage!\n'
                 embed = await newEmbed(f"{mname} is taking their turn!", monster, f"...<t:{int(atk_time + 16 + atkcount)}:R>",
                                  monster_HP,
                                  monster_HP_MAX, actions=f"Turn ends...:", color=0xFFD800)
