@@ -335,6 +335,7 @@ async def play_game(channel, bot2, optional_argument=None):
 
     monster_HP_MAX = round(((len(old_userList)) * 400))
 
+
     if loss:
         monster_HP_MAX = int(monster_HP_MAX * 0.90)
     if monster_HP_MAX < 3400:
@@ -354,6 +355,9 @@ async def play_game(channel, bot2, optional_argument=None):
 
     if mname == 'Sans':
         monster_HP_MAX = 1
+
+    if channel.id == 1147388785269669908:
+        monster_HP_MAX = 100
 
     monster_HP = monster_HP_MAX
     turnTime = 60
@@ -545,9 +549,9 @@ async def play_game(channel, bot2, optional_argument=None):
             if dmgDone[i] > tmpDMG and lastAttacker is not i:
                 tmpDMG = dmgDone[i]
                 tmpUSR = i
-        user2 = await bot.get_or_fetch_user(tmpDMG)
+        user2 = await bot.get_or_fetch_user(tmpUSR)
 
-        if tmpUSR != 0 and tmpDMG:
+        if tmpUSR != 0:
             user = await bot.get_or_fetch_user(lastAttacker)
 
             draw = random.randint(1, 10)
@@ -642,6 +646,7 @@ async def attack(action, player_hp):
         dmgDone[action.author.id] = attackDmg
     else:
         dmgDone[action.author.id] = dmgDone[action.author.id] + attackDmg
+    print(dmgDone)
 
     return attackDmg, player_hp
 
