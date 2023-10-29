@@ -43,7 +43,7 @@ class BingoSession:
         for i in range(25):
             number = random.randrange(1, self.balls)
             while number in board:
-                number = random.randrange(0, self.balls)
+                number = random.randrange(1, self.balls)
             board.append(number)
         self.boards[player] = board
         board[12] = 0
