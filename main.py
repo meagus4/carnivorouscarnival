@@ -422,6 +422,19 @@ class GameStateManager:
         db.consume_tokens(token_change, user, "Moderator action", 'private')
         await inter.send("Tokens adjusted", ephemeral=True)
 
+    @bot.slash_command(name="modify_tickets", permissions=disnake.Permissions(manage_messages=True))
+    async def modify_tickets(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member, ticket_adjustment: int):
+        """
+        Adjusts a player's ticket balance.
+
+        Parameters
+        ----------
+        user_id: Discord User ID
+        ticket_adjustment: The number of tickets you wish to add to the user.
+        """
+        db.award_tickets(ticket_adjustment, user, "Moderator action")
+        await inter.send("Tokens adjusted", ephemeral=True)
+
 @web.get("/api/consume_session")
 async def consume_session(session: str):
     """
