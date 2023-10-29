@@ -5,3 +5,4 @@ __pycache__
 carnival.db
 .venv/
 jwtsecret.token
+.vscode/settings.json
