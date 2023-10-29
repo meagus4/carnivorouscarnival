@@ -252,6 +252,9 @@ class GameStateManager:
 
                 if data == 1000:
                     if user_tickets < 1000:
+
+                        db.award_tickets(-1000, inter2.author, 'Shop')
+
                         await inter2.send(f"You do not have enough tickets to purchase this prize! This prize costs 1000 Tickets, but you've only got {user_tickets}!", ephemeral=True)
                         return
                     else:
