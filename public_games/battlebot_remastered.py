@@ -548,7 +548,7 @@ async def play_game(channel, bot2, optional_argument=None):
 
         if tmpUSR != 0:
             user = await bot.get_or_fetch_user(lastAttacker)
-            user2 = await bot.get_or_fetch_user(tmpUSR)
+            user2 = await bot.get_or_fetch_user(tmpDMG)
 
             draw = random.randint(1, 10)
             if draw <= 4:
