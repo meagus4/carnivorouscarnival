@@ -1,20 +1,10 @@
 import asyncio
-import json
-import operator
-import os
 import random
 import time
-from datetime import datetime
 import database
 
 db = database.Database()
 import disnake.ext.commands
-from disnake.ext import commands, tasks
-
-bot = None
-intents = disnake.Intents.default()
-intents.members = True
-intents.message_content = True
 
 action_to_process = False
 
@@ -327,10 +317,9 @@ async def healHandler(interaction):
     return await heal(interaction, hitpoints[interaction.author.id])
 
 
-async def play_game(channel, disnake_bot, optional_argument=None):
+async def play_game(channel, bot2, optional_argument=None):
     global old_userList, deadlist, old_deadlist, battleOngoing, hitpoints, monster_HP, lastAttacker, userList, turn, loss, dmgDone, fight_average, action_to_process, bot
-
-    bot = disnake_bot
+    bot=bot2
 
     old_deadlist = deadlist
     deadlist = []
@@ -365,6 +354,8 @@ async def play_game(channel, disnake_bot, optional_argument=None):
 
     if mname == 'Sans':
         monster_HP_MAX = 1
+
+    monster_HP_MAX = 250
 
     monster_HP = monster_HP_MAX
     turnTime = 60
@@ -547,10 +538,7 @@ async def play_game(channel, disnake_bot, optional_argument=None):
         fight_average.append(1)
         msg = f"{mname} was defeated!"
         vEmbed = await newEmbed(msg, monster, 0, 0, monster_HP_MAX, actions=False)
-        reg_c = random.randrange(20, 45)
-
-        dmg_c = random.randrange(25, 55)
-        dmg_r = random.randrange(2, 4)
+        reg_c = random.randrange(300, 650)
 
         bestAttacker = None
         tmpDMG = 0
@@ -562,8 +550,19 @@ async def play_game(channel, disnake_bot, optional_argument=None):
 
         if tmpUSR != 0:
             user = await bot.get_or_fetch_user(lastAttacker)
+            user2 = await bot.get_or_fetch_user(tmpUSR)
+
+            draw = random.randint(1, 10)
+            if draw <= 4:
+                prize, = db.award_random_prize(user2, "Battlebot", 1)
+            elif draw <= 9:
+                prize, = db.award_random_prize(user2, "Battlebot", 2)
+            else:
+                prize, = db.award_random_prize(user2, "Battlebot", 3)
+            prize_data = db.get_prize(prize)
+
             vEmbed.add_field(name='Monster Defeated',
-                             value=f'{user.name} got the final hit! They have been awarded {reg_c} Tickets!\n{await bot.get_or_fetch_user(tmpUSR).name} did the most damage, with {tmpDMG} damage! They have been awarded {dmg_c} Tickets', inline=False)
+                                value=f'{user.name} got the final hit! They have been awarded {reg_c} Tickets!\n{user2} did the most damage, with {tmpDMG} damage! They have been awarded with a {prize_data[1]}', inline=False)
         else:
             user = await bot.get_or_fetch_user(lastAttacker)
             vEmbed.add_field(name='Monster Defeated',
@@ -571,8 +570,6 @@ async def play_game(channel, disnake_bot, optional_argument=None):
                              inline=False)
         loss = False
         addCandies(user, reg_c)
-        if tmpUSR != 0:
-            addCandies(user, dmg_c, dmg_r)
     else:
         fight_average.append(0)
         msg = f"{mname} got away!"
@@ -598,7 +595,7 @@ async def attack(action, player_hp):
     elif player_hp < 25:
         attackDmg = int(attackDmg * 1.35)
 
-    n_C = random.randrange(2, 7)
+    n_C = random.randrange(30, 80)
 
     if avg < 0.3:
         rareChance = 80

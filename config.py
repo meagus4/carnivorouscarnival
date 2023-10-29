@@ -6,6 +6,7 @@ class Config(TypedDict):
     public_channel: int
     private_channel: int
     public_game_interval: int
+    cors_origins: list[str]
 
 
 def load_config() -> Config:
@@ -22,5 +23,9 @@ def load_config() -> Config:
     if not isinstance(config["public_game_interval"], int):
         raise ValueError(
             "public_game_interval must be set to an int (minutes) in config.json")
+
+    if not isinstance(config["cors_origins"], list):
+        raise ValueError(
+            "cors_origins must be set to a list of strings in config.json")
 
     return config

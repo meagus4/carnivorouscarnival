@@ -1,5 +1,7 @@
 import asyncio
 import json
+import random
+
 import disnake
 import disnake.ext.commands
 import database
@@ -115,9 +117,19 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
     score = (10 - current_row - 1) * 50
     if current_row < 0:
         score = score * 2
+        desc = f"**Congratulations!**\n{stacker_board_str}\nYou won Stacker! You earned {score} Tickets."
         embed = disnake.Embed(title="Stacker",
-                              description=f"**Congratulations!**\n{stacker_board_str}\nYou won Stacker! You earned {score} Tickets.")
-        print(current_row)
+                              description=desc)
+        if random.randint(1,3) == 3:
+            draw = random.randint(1, 10)
+            if draw <= 2:
+                prize, = db.award_random_prize(member, "Stacker", 1)
+            elif draw <= 7:
+                prize, = db.award_random_prize(member, "Stacker", 2)
+            else:
+                prize, = db.award_random_prize(member, "Stacker", 3)
+            prize_data = db.get_prize(prize)
+            desc += f"\nWow! You won a {prize_data[1]}! You can view your prizes with `/inv`"
     elif current_row < 2:
         score = int(score * 1.5)
         embed = disnake.Embed(title="Stacker",
