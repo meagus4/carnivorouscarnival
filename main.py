@@ -193,6 +193,8 @@ class GameStateManager:
 
     @bot.slash_command(name="shop")
     async def shop(self, inter: disnake.ApplicationCommandInteraction):
+        uid = hash(f"{inter.author.id}Inventory{time.time()}{random.randint(0, 1000000)}")
+        uid += sys.maxsize + 1
 
         from database import Database
         db2 = Database()  # Initialise the fucking singleton
@@ -238,14 +240,14 @@ class GameStateManager:
             embed.add_field(name=f"{(prize[3]+1)*500} Tickets | {prize[1]}", value=prize[2])
             shop_menu.add_option(value=f"{prize[0]}", label=f"{prize[1]}", description=f"Buy this for {(prize[3]+1)*500} Tickets")
         shop_menu.add_option(value="1000", label="1000 Tickets | Prize Crate", description="Warning: Content Quality is not Guaranteed.")
-        shop_menu.custom_id = time_seed
+        shop_menu.custom_id = str(uid)
         embed.set_thumbnail(random.choice(shopkeepers))
         random.seed(hash(time.time()))
         await inter.send(embed=embed, ephemeral=True, components=shop_menu)
 
         @bot.listen("on_dropdown")
         async def on_prize_select(inter2: disnake.MessageInteraction):
-            if inter2.data.custom_id == time_seed:
+            if inter2.data.custom_id.startswith(str(uid)):
                 data = int(inter2.data.values[0])
 
                 user_tickets = db.get_tickets(inter2.author)
@@ -268,6 +270,7 @@ class GameStateManager:
                         prize, = db.award_random_prize(inter.author, "Shop", rarity)
                         prize_data = db.get_prize(prize)
                         await inter2.send(f"You have purchased a Loot Box!\nInside the loot box you find a **{prize_data[1]}**!\nYou can view your new prize with `/inv`", ephemeral=True)
+                        await inter.response.edit_message(components=[])
                 else:
                     prize_list_cur = db.db.execute("select * from prizes")
                     prize_list = prize_list_cur.fetchall()
@@ -280,6 +283,7 @@ class GameStateManager:
                         db.award_prize(inter2.author, 'Shop', data)
                         db.award_tickets((0-prize_cost), inter2.author, 'Shop')
                         await inter2.send(f"Congratulations! You have obtained a {selected_prize[1]}!\nYou can view your inventory with `/inv`", ephemeral=True)
+                return
 
     @bot.slash_command(name="inv")
     async def inventory(self, inter: disnake.ApplicationCommandInteraction, user:disnake.Member = None):
