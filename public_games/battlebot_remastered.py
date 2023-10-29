@@ -554,10 +554,10 @@ async def play_game(channel, bot2, optional_argument=None):
         if tmpUSR != 0:
             user = await bot.get_or_fetch_user(lastAttacker)
 
-            draw = random.randint(1, 10)
-            if draw <= 4:
+            draw = random.randint(1, 20)
+            if draw <= 11:
                 prize, = db.award_random_prize(user2, "Battlebot", 1)
-            elif draw <= 9:
+            elif draw <= 19:
                 prize, = db.award_random_prize(user2, "Battlebot", 2)
             else:
                 prize, = db.award_random_prize(user2, "Battlebot", 3)
