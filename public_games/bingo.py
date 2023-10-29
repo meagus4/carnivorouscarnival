@@ -131,10 +131,10 @@ class BingoSession:
 
     def check_lockout(self, player: disnake.Member) -> bool:
         if player in self.timeouts:
-            if datetime.datetime.now() < self.timeouts[player]:
+            if datetime.datetime.now() < self.timeouts[player.id]:
                 return True
             else:
-                del self.timeouts[player]
+                del self.timeouts[player.id]
         return False
 
 
@@ -196,7 +196,7 @@ async def play_game(channel: disnake.TextChannel, bot: disnake.ext.commands.Bot,
                 db.award_tickets(500, player, "Bingo")
             else:
                 await interaction.send("You didn't have a bingo! You've been prevented from calling \"Bingo\" for two minutes", ephemeral=True)
-                session.timeouts[player] = datetime.datetime.now(
+                session.timeouts[player.id] = datetime.datetime.now(
                 ) + datetime.timedelta(minutes=2)
 
     await asyncio.sleep(game_delay)
