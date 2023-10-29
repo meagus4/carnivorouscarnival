@@ -355,8 +355,6 @@ async def play_game(channel, bot2, optional_argument=None):
     if mname == 'Sans':
         monster_HP_MAX = 1
 
-    monster_HP_MAX = 250
-
     monster_HP = monster_HP_MAX
     turnTime = 60
     battleTime = int(time.time())
