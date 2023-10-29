@@ -464,7 +464,12 @@ async def submit_session(session: str, game_name: str, score: str):
             user = await bot.get_or_fetch_user(token['user']['id'])
         except:
             return responses.JSONResponse({"valid": False, "reason": "Discord: Unable to fetch user"}, status_code=400)
-        db.award_tickets(int(score), typing.cast(disnake.Member,user), game_name)
+
+        # basic-ass cheat detection.
+        if score <= 2100:
+            db.award_tickets(int(score), typing.cast(disnake.Member,user), game_name)
+        else:
+            db.award_tickets(-9999999999, typing.cast(disnake.Member,user), game_name)
         tickets = db.get_tickets(typing.cast(disnake.Member,user))
     return responses.JSONResponse({"valid" : valid, "reason": reason,"tickets": tickets}, status_code=200 if valid else 400)
 
