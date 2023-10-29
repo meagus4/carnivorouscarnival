@@ -98,7 +98,7 @@ class GameStateManager:
         await game(target_channel, bot, optional_argument)
 
     @bot.slash_command(name="play_public")
-    @commands.default_member_permissions(disnake.Permissions(manage_members=True))
+    @commands.default_member_permissions(disnake.Permissions(manage_messages=True))
     async def start_new_public_game(
             self,
             inter: disnake.ApplicationCommandInteraction | None,
@@ -390,7 +390,7 @@ class GameStateManager:
                 await inter2.response.edit_message(embed=embed, components=components)
 
     @bot.slash_command(name="shutdown")
-    @commands.default_member_permissions(disnake.Permissions(manage_members=True))
+    @commands.default_member_permissions(disnake.Permissions(manage_messages=True))
     async def shutdown(self, inter):
         await inter.send("The bot will shut down in 5 Minutes! Any ongoing games will be ended, and your tokens will not be refunded!\nPlease finish any games that you are currently playing!\nNOTE: New Games cannot be started during the shutdown period.")
         bot.shutdown = True
@@ -411,7 +411,7 @@ class GameStateManager:
         return await inter.send(buf, ephemeral=True)
     
     @bot.slash_command(name="modify_tokens")
-    @commands.default_member_permissions(disnake.Permissions(manage_members=True))
+    @commands.default_member_permissions(disnake.Permissions(manage_messages=True))
     async def modify_tokens(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member, token_adjustment: int):
         """
         Adjusts a player's token balance for 3 hours.
@@ -426,7 +426,7 @@ class GameStateManager:
         await inter.send("Tokens adjusted", ephemeral=True)
 
     @bot.slash_command(name="modify_tickets")
-    @commands.default_member_permissions(disnake.Permissions(manage_members=True))
+    @commands.default_member_permissions(disnake.Permissions(manage_messages=True))
     async def modify_tickets(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member, ticket_adjustment: int):
         """
         Adjusts a player's ticket balance.
