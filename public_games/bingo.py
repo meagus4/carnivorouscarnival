@@ -29,7 +29,7 @@ class BingoSession:
     balls = 75
     played_balls = [0]
     boards: dict[disnake.Member, list[int]] = {}
-    timeouts: dict[disnake.Member, datetime.datetime] = []
+    timeouts: dict[disnake.Member, datetime.datetime] = {}
     won = False
     buttonsalt: str
     game_message: disnake.Message
