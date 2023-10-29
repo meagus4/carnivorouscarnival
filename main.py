@@ -273,7 +273,7 @@ class GameStateManager:
                 else:
                     prize_list_cur = db.db.execute("select * from prizes")
                     prize_list = prize_list_cur.fetchall()
-                    selected_prize = prize_list[data-1]
+                    selected_prize = prize_list[data]
                     prize_cost = (selected_prize[3]+1)*500
                     if user_tickets < prize_cost:
                         await inter2.send(f"You do not have enough tickets to purchase this prize! This prize costs {prize_cost} Tickets, but you've only got {user_tickets}!", ephemeral=True)
@@ -290,7 +290,6 @@ class GameStateManager:
 
         inv_view = user or inter.author
         async def display_item(prize_dict:dict, embed:disnake.Embed, index):
-
             item = list(prize_dict.keys())[index]
             prize_data = db.get_prize(item)
 
