@@ -254,5 +254,37 @@
       "rarity": "3",
       "image": "[\"https://rutdiscord.github.io/halloween2023/final/plushie/plushieLegendary.blend\"]",
       "preview": "https://rutdiscord.github.io/halloween2023/final/plushie/plushieLegendary.gif"
+    },
+    {
+        "id": 32,
+        "name": "Framed Photo of Mettaton's Biggest Fan (Slimy)",
+        "description": "Smells like pennies.",
+        "rarity": "0",
+        "image": "[\"https://rutdiscord.github.io/halloween2023/final/mirror/mirrorCommon.blend\"]",
+        "preview": "https://rutdiscord.github.io/halloween2023/final/mirror/mirrorCommon.gif"
+    },
+    {
+        "id": 33,
+        "name": "Framed Photo of Mettaton's Biggest Fan (Half-Price)",
+        "description": "You've\\* never\\* looked\\* better\\*.",
+        "rarity": "1",
+        "image": "[\"https://rutdiscord.github.io/halloween2023/final/mirror/mirrorRare.blend\"]",
+        "preview": "https://rutdiscord.github.io/halloween2023/final/mirror/mirrorRare.gif"
+    },
+    {
+        "id": 34,
+        "name": "Framed Photo of Mettaton's Biggest Fan (Specil)",
+        "description": "For best results, lock your phone screen now.",
+        "rarity": "2",
+        "image": "[\"https://rutdiscord.github.io/halloween2023/final/mirror/mirrorEpic.blend\"]",
+        "preview": "https://rutdiscord.github.io/halloween2023/final/mirror/mirrorEpic.gif"
+    },
+    {
+        "id": 35,
+        "name": "Framed Photo of Mettaton's Biggest Fan [BIG SHOT]",
+        "description": "Your fingers smudge it almost instantly.",
+        "rarity": "3",
+        "image": "[\"https://rutdiscord.github.io/halloween2023/final/mirror/mirrorLegendary.blend\"]",
+        "preview": "https://rutdiscord.github.io/halloween2023/final/mirror/mirrorLegendary.gif"
     }
-  ]
+]
