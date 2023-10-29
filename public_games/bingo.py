@@ -69,14 +69,11 @@ class BingoSession:
                         value="We haven't started yet, go get a board!\n"
                         "Take a screenshot and mark down emojis you have.\n"
                         "For phone users... grab a pencil and mark down a grid on paper to keep track.\n"
-                        "We also have the grid below if you'd like to use that."
                         f"Game starts in {disnake.utils.format_dt(start_time,style='R')}", inline=False
                         )
         embed.add_field(name="Current player count:", value="0", inline=False)
         embed.add_field(name="Number of played emojis:",
                         value="0", inline=False)
-
-        embed.add_field(name="Track your emojis from your card here:",value="||✅|| ||✅|| ||✅|| ||✅|| ||✅||\n\n"*5)
 
         salt = self.buttonsalt
         message = await channel.send(
@@ -191,9 +188,9 @@ async def play_game(channel: disnake.TextChannel, bot: disnake.ext.commands.Bot,
             if won:
                 await channel.send(f"{player.mention} won the game by completing: \"{bingo_type}\"!")
                 session.game_embed.set_field_at(
-                    0, name="Current emoji", value=f"The game has ended.{player.mention} won 500 tickets.")
+                    0, name="Current emoji", value=f"The game has ended.{player.mention} won 1000 tickets.")
                 session.won = True
-                db.award_tickets(500, player, "Bingo")
+                db.award_tickets(1000, player, "Bingo")
             else:
                 await interaction.send("You didn't have a bingo! You've been prevented from calling \"Bingo\" for two minutes", ephemeral=True)
                 session.timeouts[player.id] = datetime.datetime.now(
@@ -210,7 +207,7 @@ async def play_game(channel: disnake.TextChannel, bot: disnake.ext.commands.Bot,
             sesmgr.sessions.pop(session.buttonsalt)
             return
         session.game_embed.set_field_at(
-            0, name="Current emoji", value=f"{fmt_emoji(session.play_ball())}")
+            0, name="Current emoji", value=f"{fmt_emoji(ball)}")
         session.game_embed.set_field_at(
             1, name="Current player count:", value=f"{len(session.boards)}")
         session.game_embed.set_field_at(
