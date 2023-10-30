@@ -72,11 +72,17 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
 
     @bot.listen("on_button_click")
     async def on_button_click(inter: disnake.MessageInteraction):
-        nonlocal spin_active
+        nonlocal spin_active, progress
         if inter.component.custom_id.startswith(uid):
             await inter.send("Inflating the Balloon!", ephemeral=True)
             spin_active = True
             spin_button.disabled = True
+        temp = db.get_game_data("Balloon", member)
+        if temp:
+            progress, = temp
+            progress = int(progress)
+        else:
+            progress = 0
 
     for i in possible_progress[0:10]:
         if i == 1:
@@ -99,6 +105,7 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
 
     while attempts > 0 and not balloon_popped:
         while spin_active:
+            db.set_game_data("Balloon", member, 0)
             if possible_progress[step] == 1:
                 display += "🟥"
             elif possible_progress[step] == 2:
@@ -114,7 +121,7 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
 
             embed = disnake.Embed(title="Balloon Popper",
                                   description=f"Try and pop the balloon! You have **{attempts}** Attempts Remaining.\n{progress_to_string(progress)}\n:small_red_triangle_down:\n"
-                                              f"{display}\n:small_red_triangle:")
+                                              f"{display}\n:small_red_triangle:\nWARNING: Attempting to spin the wheel while another instance of the wheel is already spinning WILL reset your progress!")
             await message.edit(embed=embed, components=spin_button)
 
             step += 1
@@ -178,6 +185,7 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
 
             await message.edit(embed=embed, components=spin_button)
             spin_active = False
+            db.set_game_data("Balloon", member, progress)
             if attempts == 0:
 
                 if progress >= 20:

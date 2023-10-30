@@ -1,3 +1,5 @@
+import asyncio
+
 import disnake
 import disnake.ext.commands
 import time
@@ -90,3 +92,10 @@ async def play_game(channel: disnake.TextChannel, bot:disnake.ext.commands.Bot, 
             return
         else:
             return
+
+    await asyncio.sleep(1200)
+    start_embed.description = f"Time out! {len(winners)} people guessed the word\n The word was {word}"
+    await message.edit(embed=start_embed, components=[])
+    bot.remove_listener(on_wordle_click)
+    bot.remove_listener(on_wordle_submit)
+    return
