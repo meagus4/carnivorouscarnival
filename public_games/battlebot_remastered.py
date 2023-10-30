@@ -568,7 +568,7 @@ async def play_game(channel, bot2, optional_argument=None):
         else:
             user = await bot.get_or_fetch_user(lastAttacker)
             vEmbed.add_field(name='Monster Defeated',
-                             value=f'{await user.name} got the final hit! They have been awarded {reg_c} Tickets!',
+                             value=f'{user.name} got the final hit! They have been awarded {reg_c} Tickets!',
                              inline=False)
         loss = False
         addCandies(user, reg_c)
