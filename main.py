@@ -297,7 +297,7 @@ class GameStateManager:
             item = list(prize_dict.keys())[index]
             prize_data = db.get_prize(item)
 
-            embed.add_field(name=f"{prize_data[1]}", value=f"*{prize_data[2]}*\nYou have {prize_dict[item]} of these.")
+            embed.add_field(name=f"{prize_data[1]}", value=f"*{prize_data[2]}*\nThere are {prize_dict[item]} of these.")
             embed.set_image(url=prize_data[5])
             files = json.loads(prize_data[4])
             actionrow = disnake.ui.ActionRow()
