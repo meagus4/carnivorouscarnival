@@ -59,8 +59,14 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
     if temp:
         progress, = temp
         progress = int(progress)
+
+        if progress < 0:
+            await thread.send("You cannot start another instance of Balloon Burst while it is already running!")
+            db.consume_tokens(self, -1, member, "Balloon Refund", "private"):
+            return
     else:
         progress = 0
+    db.set_game_data("Balloon", member, -1)
 
     starting_progress = progress
     balloon_popped = False
@@ -77,12 +83,6 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
             await inter.send("Inflating the Balloon!", ephemeral=True)
             spin_active = True
             spin_button.disabled = True
-        temp = db.get_game_data("Balloon", member)
-        if temp:
-            progress, = temp
-            progress = int(progress)
-        else:
-            progress = 0
 
     for i in possible_progress[0:10]:
         if i == 1:
@@ -105,7 +105,6 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
 
     while attempts > 0 and not balloon_popped:
         while spin_active:
-            db.set_game_data("Balloon", member, 0)
             if possible_progress[step] == 1:
                 display += "🟥"
             elif possible_progress[step] == 2:
@@ -185,7 +184,6 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
 
             await message.edit(embed=embed, components=spin_button)
             spin_active = False
-            db.set_game_data("Balloon", member, progress)
             if attempts == 0:
 
                 if progress >= 20:
