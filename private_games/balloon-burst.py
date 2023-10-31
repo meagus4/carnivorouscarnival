@@ -120,7 +120,7 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
 
             embed = disnake.Embed(title="Balloon Popper",
                                   description=f"Try and pop the balloon! You have **{attempts}** Attempts Remaining.\n{progress_to_string(progress)}\n:small_red_triangle_down:\n"
-                                              f"{display}\n:small_red_triangle:\nWARNING: Attempting to spin the wheel while another instance of the wheel is already spinning WILL reset your progress!")
+                                              f"{display}\n:small_red_triangle:")
             await message.edit(embed=embed, components=spin_button)
 
             step += 1
