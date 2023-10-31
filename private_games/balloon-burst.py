@@ -62,7 +62,7 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
 
         if progress < 0:
             await thread.send("You cannot start another instance of Balloon Burst while it is already running!")
-            db.consume_tokens(self, -1, member, "Balloon Refund", "private"):
+            db.consume_tokens(self, -1, member, "Balloon Refund", "private")
             return
     else:
         progress = 0
