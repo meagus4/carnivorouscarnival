@@ -155,14 +155,16 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
                 progress_text ="JACKPOT! Luck shines upon you and you instantly burst the balloon!"
                 progress += 20
             if progress >= 20:
-                db.award_tickets(1750, member, "Balloon")
+                db.award_tickets(1350, member, "Balloon")
                 win_text = f"\nThe balloon has burst! You earned 1750 Tickets! You now have {db.get_tickets(member)} Tickets."
                 if random.randint(1, 2) == 1:
 
-                    draw = random.randint(1, 10)
-                    if draw <= 2:
+                    draw = random.randint(1, 25)
+                    if draw <= 6:
+                        prize, = db.award_random_prize(member, "Balloon", 0)
+                    elif draw <= 16:
                         prize, = db.award_random_prize(member, "Balloon", 1)
-                    elif draw <= 7:
+                    elif draw <= 24:
                         prize, = db.award_random_prize(member, "Balloon", 2)
                     else:
                         prize, = db.award_random_prize(member, "Balloon", 3)
@@ -171,7 +173,7 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
                 spin_button = []
                 attempts = 0
             elif attempts == 0:
-                tickets = (progress - starting_progress)*100
+                tickets = (progress - starting_progress)*75
                 db.award_tickets(tickets, member, "Balloon")
                 win_text = f"\nYou ran out of breath! You earned {tickets} Tickets! You now have {db.get_tickets(member)} Tickets.\nNote: Balloon Progress persists between rounds!"
                 spin_button = []
