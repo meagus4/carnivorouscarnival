@@ -459,7 +459,7 @@ async def consume_session(session: str):
     return responses.JSONResponse({"valid": valid}, status_code=200 if valid else 400)
 
 @web.get("/api/submit_session")
-async def submit_session(session: str, game_name: str, score: str, reward=False: bool):
+async def submit_session(session: str, game_name: str, score: str, reward: bool=False):
     """
     Submit a completed game using your session token. Games can be submitted *once*.
     """
@@ -487,7 +487,18 @@ async def submit_session(session: str, game_name: str, score: str, reward=False:
             db.award_tickets(-9999999999, typing.cast(disnake.Member,user), game_name)
         tickets = db.get_tickets(typing.cast(disnake.Member,user))
         if reward:
-            reward = db.award_random_prize()
+            rarity = 3
+            chance = random.randint(1,20)
+            if chance <= 7:
+                rarity = 0
+            elif chance <= 14:
+                rarity = 1
+            elif chance <= 18:
+                rarity = 2
+
+            prize = db.award_random_prize(typing.cast(disnake.Member,user), game_name, rarity)
+            prize_data = db.get_prize(prize)
+            reward = prize_data[1]
     return responses.JSONResponse({"valid" : valid, "reason": reason,"tickets": tickets, "reward": reward}, status_code=200 if valid else 400)
 
 
