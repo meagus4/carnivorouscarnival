@@ -430,7 +430,7 @@ async def consume_session(session: str):
     return responses.JSONResponse({"valid": valid}, status_code=200 if valid else 400)
 
 @web.get("/api/submit_session")
-async def submit_session(session: str, game_name: str, score: str):
+async def submit_session(session: str, game_name: str, score: str, reward=False: bool):
     """
     Submit a completed game using your session token. Games can be submitted *once*.
     """
@@ -444,6 +444,7 @@ async def submit_session(session: str, game_name: str, score: str):
     token = tokentools.decrypt_token(session)
 
     tickets = 0
+
     if valid:
         try:
             user = await bot.get_or_fetch_user(token['user']['id'])
@@ -451,7 +452,9 @@ async def submit_session(session: str, game_name: str, score: str):
             return responses.JSONResponse({"valid": False, "reason": "Discord: Unable to fetch user"}, status_code=400)
         db.award_tickets(int(score), typing.cast(disnake.Member,user), game_name)
         tickets = db.get_tickets(typing.cast(disnake.Member,user))
-    return responses.JSONResponse({"valid" : valid, "reason": reason,"tickets": tickets}, status_code=200 if valid else 400)
+        if reward:
+            reward = db.award_random_prize()
+    return responses.JSONResponse({"valid" : valid, "reason": reason,"tickets": tickets, "reward": reward}, status_code=200 if valid else 400)
 
 
 if __name__ == '__main__':
