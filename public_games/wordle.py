@@ -69,7 +69,7 @@ async def play_game(channel: disnake.TextChannel, bot:disnake.ext.commands.Bot, 
                 db.award_tickets(800 - (len(winners)*100), interaction.author,  "Wordle")
                 winners.append(interaction.author)
 
-                if len(winners) >= 3:
+                if len(winners) == 3:
                     start_embed.add_field(name="Three People have guessed the word!", value=f"Thanks for playing! The word was {word}")
                     await message.edit(embed=start_embed, components=[])
                     bot.remove_listener(on_wordle_click)

@@ -378,7 +378,7 @@ async def play_game(channel, bot2, optional_argument=None):
                               disabled=False))])
 
     @bot.listen("on_button_click")
-    async def on_button_click(interaction):
+    async def on_battle_press(interaction):
         global userList, hitpoints, action_to_process
 
         if interaction.component.custom_id != 'attack_enemy' and interaction.component.custom_id != 'heal_player' and interaction.component.custom_id != 'throw_candy':
@@ -582,7 +582,7 @@ async def play_game(channel, bot2, optional_argument=None):
     await message.edit(embed=vEmbed)
 
     old_userList = hitpoints.items()
-
+    bot.remove_listener(on_battle_press)
 
 async def attack(action, player_hp):
     global dmgDone, lastAttacker

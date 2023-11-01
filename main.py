@@ -121,8 +121,8 @@ class GameStateManager:
         # Ugliest bodge I've ever written, please fix
         # it's needed here too. i hate it. -bliv
         self = typing.cast(GameStateManager, gsm)
+        await inter.send("Starting the requested game.", ephemeral=True)
         await self._start_new_public_game(game_name, optional_argument)
-        await inter.send("Started the requested game.", ephemeral=True)
 
     @tasks.loop(minutes=config['public_game_interval'])
     async def start_timed_new_public_game(self):
@@ -231,27 +231,35 @@ class GameStateManager:
 
         embed = disnake.Embed(title="Welcome to the SHOP!", description="Buy yourself some DISCOUNT prizes!!")
         embed.add_field(name="1000 Tickets | Prize Crate", value="Guaranteed to contain a prize of some sort.\nWarning: Content Quality is not Guaranteed.")
-        shop_menu = disnake.ui.Select()
+
 
         random.seed(time_seed)
         random.shuffle(bad_items)
         current_prizes = bad_items[:4]
         current_prizes.append(random.choice(less_bad_items))
 
-        for prize in current_prizes:
-            embed.add_field(name=f"{(prize[3]+1)*500} Tickets | {prize[1]}", value=prize[2])
-            shop_menu.add_option(value=f"{prize[0]}", label=f"{prize[1]}", description=f"Buy this for {(prize[3]+1)*500} Tickets")
-        shop_menu.add_option(value="1000", label="1000 Tickets | Prize Crate", description="Warning: Content Quality is not Guaranteed.")
-        shop_menu.custom_id = str(uid)
+        def create_dropdown():
+            components = []
+            shop_menu = disnake.ui.ActionRow()
+            for prize in current_prizes:
+                embed.add_field(name=f"{(prize[3] + 1) * 500} Tickets | {prize[1]}", value=prize[2])
+                shop_menu.add_button(style=disnake.ButtonStyle.blurple, label=f"{prize[1]} | {(prize[3] + 1) * 500} Tickets", custom_id=f"{uid}-{prize[0]}")
+            lootbox_menu = disnake.ui.ActionRow()
+            lootbox_menu.add_button(style=disnake.ButtonStyle.green, label="Prize Crate | 1000 Tickets", custom_id=f"{uid}-{1000}")
+            components.append(shop_menu)
+            components.append(lootbox_menu)
+            return components
+
+        shop_menu = create_dropdown()
         embed.set_thumbnail(random.choice(shopkeepers))
         random.seed(hash(time.time()))
-        await inter.send(embed=embed, ephemeral=True, components=shop_menu)
+        message = await inter.send(embed=embed, ephemeral=True, components=shop_menu)
 
-        @bot.listen("on_dropdown")
+        @bot.listen("on_button_click")
         async def on_prize_select(inter2: disnake.MessageInteraction):
             if inter2.data.custom_id.startswith(str(uid)):
-                data = int(inter2.data.values[0])
 
+                data = int(inter2.data.custom_id.split('-')[1])
                 user_tickets = db.get_tickets(inter2.author)
 
                 if data == 1000:
@@ -272,7 +280,6 @@ class GameStateManager:
                         prize, = db.award_random_prize(inter.author, "Shop", rarity)
                         prize_data = db.get_prize(prize)
                         await inter2.send(f"You have purchased a Loot Box!\nInside the loot box you find a **{prize_data[1]}**!\nYou can view your new prize with `/inv`", ephemeral=True)
-                        await inter.response.edit_message(components=[])
                 else:
                     prize_list_cur = db.db.execute("select * from prizes")
                     prize_list = prize_list_cur.fetchall()
@@ -286,7 +293,9 @@ class GameStateManager:
                         db.award_tickets((0-prize_cost), inter2.author, 'Shop')
                         await inter2.send(f"Congratulations! You have obtained a {selected_prize[1]}!\nYou can view your inventory with `/inv`", ephemeral=True)
                 return
-
+            new_shop_menu = create_dropdown()
+            await message.edit(components=[])
+            await message.edit(components=new_shop_menu)
     @bot.slash_command(name="inv")
     async def inventory(self, inter: disnake.ApplicationCommandInteraction, user:disnake.Member = None):
 
