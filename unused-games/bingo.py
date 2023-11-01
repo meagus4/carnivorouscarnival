@@ -29,7 +29,7 @@ class BingoSession:
     balls = 75
     played_balls = [0]
     boards: dict[disnake.Member, list[int]] = {}
-    timeouts: dict[disnake.Member, datetime.datetime] = []
+    timeouts: dict[disnake.Member, datetime.datetime] = {}
     won = False
     buttonsalt: str
     game_message: disnake.Message
@@ -43,7 +43,7 @@ class BingoSession:
         for i in range(25):
             number = random.randrange(1, self.balls)
             while number in board:
-                number = random.randrange(0, self.balls)
+                number = random.randrange(1, self.balls)
             board.append(number)
         self.boards[player] = board
         board[12] = 0
@@ -69,14 +69,11 @@ class BingoSession:
                         value="We haven't started yet, go get a board!\n"
                         "Take a screenshot and mark down emojis you have.\n"
                         "For phone users... grab a pencil and mark down a grid on paper to keep track.\n"
-                        "We also have the grid below if you'd like to use that."
                         f"Game starts in {disnake.utils.format_dt(start_time,style='R')}", inline=False
                         )
         embed.add_field(name="Current player count:", value="0", inline=False)
         embed.add_field(name="Number of played emojis:",
                         value="0", inline=False)
-
-        embed.add_field(name="Track your emojis from your card here:",value="||✅|| ||✅|| ||✅|| ||✅|| ||✅||\n\n"*5)
 
         salt = self.buttonsalt
         message = await channel.send(
@@ -131,10 +128,10 @@ class BingoSession:
 
     def check_lockout(self, player: disnake.Member) -> bool:
         if player in self.timeouts:
-            if datetime.datetime.now() < self.timeouts[player]:
+            if datetime.datetime.now() < self.timeouts[player.id]:
                 return True
             else:
-                del self.timeouts[player]
+                del self.timeouts[player.id]
         return False
 
 
@@ -191,12 +188,12 @@ async def play_game(channel: disnake.TextChannel, bot: disnake.ext.commands.Bot,
             if won:
                 await channel.send(f"{player.mention} won the game by completing: \"{bingo_type}\"!")
                 session.game_embed.set_field_at(
-                    0, name="Current emoji", value=f"The game has ended.{player.mention} won 500 tickets.")
+                    0, name="Current emoji", value=f"The game has ended.{player.mention} won 1000 tickets.")
                 session.won = True
-                db.award_tickets(500, player, "Bingo")
+                db.award_tickets(1000, player, "Bingo")
             else:
                 await interaction.send("You didn't have a bingo! You've been prevented from calling \"Bingo\" for two minutes", ephemeral=True)
-                session.timeouts[player] = datetime.datetime.now(
+                session.timeouts[player.id] = datetime.datetime.now(
                 ) + datetime.timedelta(minutes=2)
 
     await asyncio.sleep(game_delay)
@@ -210,7 +207,7 @@ async def play_game(channel: disnake.TextChannel, bot: disnake.ext.commands.Bot,
             sesmgr.sessions.pop(session.buttonsalt)
             return
         session.game_embed.set_field_at(
-            0, name="Current emoji", value=f"{fmt_emoji(session.play_ball())}")
+            0, name="Current emoji", value=f"{fmt_emoji(ball)}")
         session.game_embed.set_field_at(
             1, name="Current player count:", value=f"{len(session.boards)}")
         session.game_embed.set_field_at(
