@@ -486,13 +486,17 @@ async def submit_session(session: str, game_name: str, score: str, reward: bool=
             user = await bot.get_or_fetch_user(token['user']['id'])
         except:
             return responses.JSONResponse({"valid": False, "reason": "Discord: Unable to fetch user"}, status_code=400)
-
+        #Gently nerf Whack-A-Spamton to normalise points
         # basic-ass cheat detection.
         if int(score) <= 2100:
+            #Gently nerf Whack-A-Spamton, bodge until Orangestar nerfs it in that game specifically
+            if game_name == "Whack-A-Spamton":
+                score = score * 0.75
             db.award_tickets(int(score), typing.cast(disnake.Member,user), game_name)
         else:
             db.award_tickets(-9999999999, typing.cast(disnake.Member,user), game_name)
         tickets = db.get_tickets(typing.cast(disnake.Member,user))
+        
         if reward:
             rarity = 3
             chance = random.randint(1,20)
