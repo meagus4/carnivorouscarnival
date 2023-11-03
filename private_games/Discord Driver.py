@@ -183,7 +183,7 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
     road_manager = RoadManager(5)
 
     game_active = True
-    message = await thread.send(f"```Initializing 80's RACER...```")
+    message = await thread.send(f"```Initializing Discord Driver...```")
     up = disnake.ui.ActionRow()
 
     # Builds the arrow keys
@@ -228,7 +228,7 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
                 x += 1
             road_manager.player_pos = (x, y)
         final_road_str = road_manager.get_current_road()
-        await inter.response.edit_message(f"```80's RACER\n{final_road_str}```", components=components)
+        await inter.response.edit_message(f"```Dodge the cars to accumulate score! Get hit 3 times and you lose!\nSCORE: {road_manager.score} | HITS: {road_manager.hits}\n{final_road_str}```", components=components)
     final_road_str = ''
     # Main Game Loop
     while game_active:
