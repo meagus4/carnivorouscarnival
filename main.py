@@ -496,7 +496,7 @@ async def submit_session(session: str, game_name: str, score: str, reward: bool=
             elif chance <= 18:
                 rarity = 2
 
-            prize = db.award_random_prize(typing.cast(disnake.Member,user), game_name, rarity)
+            prize, = db.award_random_prize(typing.cast(disnake.Member,user), game_name, rarity)
             prize_data = db.get_prize(prize)
             reward = prize_data[1]
     return responses.JSONResponse({"valid" : valid, "reason": reason,"tickets": tickets, "reward": reward}, status_code=200 if valid else 400)
