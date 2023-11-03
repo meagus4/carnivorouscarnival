@@ -166,12 +166,14 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
                 player_position += outside
                 player_position = math.ceil(player_position)
                 temp_slice = list(self.lane_1)
+                temp_slice[obstacle_position + 1] = ''  # Accounts for 2-width of Emoji
                 temp_slice[player_position] = '❤️'
                 self.lane_1 = ''.join(temp_slice)
             elif player == 1:
                 player_position = inside / 2
                 player_position = math.floor(player_position)
                 temp_slice = list(self.lane_2)
+                temp_slice[obstacle_position - 1] = ''  # Accounts for 2-width of Emoji
                 temp_slice[player_position] = '❤️'
                 self.lane_2 = ''.join(temp_slice)
             # Draws the Road
@@ -261,5 +263,6 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
             end_game_message += f"\n{final_road_str}```"
     else:
         end_game_message = f"```Game Over! You were hit too many times! You earned {road_manager.score} Tickets this run.\n{final_road_str}```"
+    db.award_tickets(road_manager.score, member, "Race")
     end_game_message += f"You now have {db.get_tickets(member)} Tickets!"
     await message.edit(end_game_message, components=[])

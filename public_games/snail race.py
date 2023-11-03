@@ -137,7 +137,15 @@ async def play_game(channel: disnake.TextChannel, bot: disnake.ext.commands.Bot,
     bot.remove_listener(snail_press)
     winner = max(snails, key=lambda s: s.progress)
 
-    tickets = 1200 - (len(winner.friends)-1 * 100)
+    tickets = 120 - (len(winner.friends)-1 * 10)
+
+    total_players = 0
+    for s in snails:
+        total_players += len(s.friends)
+    if total_players > 10:
+        total_players = 10
+    tickets = tickets * total_players
+
     if tickets < 500:
         tickets = 500
 
