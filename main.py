@@ -486,7 +486,7 @@ async def submit_session(session: str, game_name: str, score: str, reward: bool=
             user = await bot.get_or_fetch_user(token['user']['id'])
         except:
             return responses.JSONResponse({"valid": False, "reason": "Discord: Unable to fetch user"}, status_code=400)
-        #Gently nerf Whack-A-Spamton to normalise points
+        
         # basic-ass cheat detection.
         if int(score) <= 2100:
             #Gently nerf Whack-A-Spamton, bodge until Orangestar nerfs it in that game specifically
