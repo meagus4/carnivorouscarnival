@@ -166,14 +166,14 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
                 player_position += outside
                 player_position = math.ceil(player_position)
                 temp_slice = list(self.lane_1)
-                temp_slice[obstacle_position + 1] = ''  # Accounts for 2-width of Emoji
+                temp_slice[player_position + 1] = ''  # Accounts for 2-width of Emoji
                 temp_slice[player_position] = '❤️'
                 self.lane_1 = ''.join(temp_slice)
             elif player == 1:
                 player_position = inside / 2
                 player_position = math.floor(player_position)
                 temp_slice = list(self.lane_2)
-                temp_slice[obstacle_position - 1] = ''  # Accounts for 2-width of Emoji
+                temp_slice[player_position - 1] = ''  # Accounts for 2-width of Emoji
                 temp_slice[player_position] = '❤️'
                 self.lane_2 = ''.join(temp_slice)
             # Draws the Road
