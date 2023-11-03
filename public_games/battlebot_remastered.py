@@ -556,11 +556,11 @@ async def play_game(channel, bot2, optional_argument=None):
 
             draw = random.randint(1, 20)
             if draw <= 11:
-                prize, = db.award_random_prize(user2, "Battlebot", 1)
+                prize = db.award_random_prize(user2, "Battlebot", 1)
             elif draw <= 19:
-                prize, = db.award_random_prize(user2, "Battlebot", 2)
+                prize = db.award_random_prize(user2, "Battlebot", 2)
             else:
-                prize, = db.award_random_prize(user2, "Battlebot", 3)
+                prize = db.award_random_prize(user2, "Battlebot", 3)
             prize_data = db.get_prize(prize)
 
             vEmbed.add_field(name='Monster Defeated',

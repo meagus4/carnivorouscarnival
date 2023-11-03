@@ -161,13 +161,13 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
 
                     draw = random.randint(1, 25)
                     if draw <= 6:
-                        prize, = db.award_random_prize(member, "Balloon", 0)
+                        prize = db.award_random_prize(member, "Balloon", 0)
                     elif draw <= 16:
-                        prize, = db.award_random_prize(member, "Balloon", 1)
+                        prize = db.award_random_prize(member, "Balloon", 1)
                     elif draw <= 24:
-                        prize, = db.award_random_prize(member, "Balloon", 2)
+                        prize = db.award_random_prize(member, "Balloon", 2)
                     else:
-                        prize, = db.award_random_prize(member, "Balloon", 3)
+                        prize = db.award_random_prize(member, "Balloon", 3)
                     prize_data = db.get_prize(prize)
                     win_text += f"\nWow! You won a {prize_data[1]}! You can view your prizes with `/inv`"
                 spin_button = []
