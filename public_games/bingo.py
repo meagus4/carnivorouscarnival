@@ -157,6 +157,7 @@ def __init__():
 async def play_game(channel: disnake.TextChannel, bot: disnake.ext.commands.Bot, optional: str | None = None):
     session = BingoSession()
     game_message = await session.generate_global_embed(channel)
+    await channel.send("||✅|| ||✅|| ||✅|| ||✅|| ||✅|| ||✅||\n"*5)
     sesmgr.sessions[session.buttonsalt] = session
     won = False
 
@@ -219,3 +220,4 @@ async def play_game(channel: disnake.TextChannel, bot: disnake.ext.commands.Bot,
         await session.game_message.edit(embed=session.game_embed)
         await asyncio.sleep(seconds_per_turn)
     sesmgr.sessions.pop(session.buttonsalt)
+    bot.remove_listener(on_button_click)
