@@ -157,7 +157,7 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
             if progress >= 20:
                 db.award_tickets(1350, member, "Balloon")
                 win_text = f"\nThe balloon has burst! You earned 1350 Tickets! You now have {db.get_tickets(member)} Tickets."
-                if random.randint(1, 2) == 1:
+                if random.randint(1, 3) == 1:
 
                     draw = random.randint(1, 25)
                     if draw <= 6:

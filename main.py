@@ -302,19 +302,26 @@ class GameStateManager:
         """View your, or another members' inventory."""
 
         inv_view = user or inter.author
-        async def display_item(prize_dict:dict, embed:disnake.Embed, index):
+        if inv_view == inter.author:
+            is_owner = True
+        else:
+            is_owner = False
+        async def display_item(prize_dict:dict, embed:disnake.Embed, index, is_owner = True):
             item = list(prize_dict.keys())[index]
             prize_data = db.get_prize(item)
 
             embed.add_field(name=f"{prize_data[1]}", value=f"*{prize_data[2]}*\nThere are {prize_dict[item]} of these.")
             embed.set_image(url=prize_data[5])
             files = json.loads(prize_data[4])
-            actionrow = disnake.ui.ActionRow()
-            for f in files:
-                filetype = f.split(".")
-                actionrow.add_button(label=f".{filetype[-1]}", url=f, style=disnake.ButtonStyle.url)
-            components = [actionrow]
-            return embed, components
+            if is_owner:
+                actionrow = disnake.ui.ActionRow()
+                for f in files:
+                    filetype = f.split(".")
+                    actionrow.add_button(label=f".{filetype[-1]}", url=f, style=disnake.ButtonStyle.url)
+                download_comps = [actionrow]
+            else:
+                download_comps = []
+            return embed, download_comps
 
         def create_buttons(uid:int, index:int, disable:str | None='left'):
             large_left = disnake.ui.Button(label='<<', custom_id=f'{uid}-ll', style=disnake.ButtonStyle.green)
@@ -357,7 +364,7 @@ class GameStateManager:
                 else:
                     unique_list[prize[2]] += 1
 
-            embed, components = await display_item(unique_list, embed, index)
+            embed, components = await display_item(unique_list, embed, index, is_owner)
 
             # Adds Navigation Buttons
             components.append(create_buttons(uid, index))
@@ -374,7 +381,7 @@ class GameStateManager:
 
         @bot.listen("on_button_click")
         async def inventory_press(inter2: disnake.MessageInteraction):
-            nonlocal index, embed, unique_list, components, message, uid
+            nonlocal index, embed, unique_list, components, message, uid, is_owner
             if inter2.data.custom_id.startswith(str(uid)):
                 move_type = inter2.data.custom_id.split('-')[1]
                 disable = None
@@ -394,7 +401,7 @@ class GameStateManager:
                     disable = 'right'
 
                 embed.clear_fields()
-                embed, components = await display_item(unique_list, embed, index)
+                embed, components = await display_item(unique_list, embed, index, is_owner)
                 components.append(create_buttons(uid, index, disable))
                 await inter2.response.edit_message(embed=embed, components=components)
 

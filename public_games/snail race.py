@@ -136,8 +136,18 @@ async def play_game(channel: disnake.TextChannel, bot: disnake.ext.commands.Bot,
     # Announce Winner
     bot.remove_listener(snail_press)
     winner = max(snails, key=lambda s: s.progress)
-    embed.description = f"The winner is {winner.name}! All supporters of {winner.name} have been rewarded with 1000 Tickets!"
-    await message.edit(embed=embed, components=[])
+
+    tickets = 1200 - (len(winner.friends)-1 * 100)
+    if tickets < 500:
+        tickets = 500
+
+    prizes_string = ""
+
     for u in winner.friends:
-        db.award_tickets(800, u, "Snail Race")
-    # TODO: Award prizes rarely.
+        db.award_tickets(tickets, u, "Snail Race")
+        if random.randint(1, 100) == 100 and len(winner.friends) > 3:
+            prizes_string += f"\n{u.name} has won a **GOLDEN SNAIL**!"
+            db.award_prize(u, "Snail Race", 48)
+
+    embed.description = f"The winner is {winner.name}! All supporters of {winner.name} have been rewarded with {tickets} Tickets!{prizes_string}"
+    await message.edit(embed=embed, components=[])

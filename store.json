@@ -286,5 +286,109 @@
         "rarity": "3",
         "image": "[\"https://rutdiscord.github.io/halloween2023/final/mirror/mirrorLegendary.blend\"]",
         "preview": "https://rutdiscord.github.io/halloween2023/final/mirror/mirrorLegendary.gif"
+    },
+    {
+        "id": 36,
+        "name": "Phillip Banks (Slimy)",
+        "description": "Smells like chicken & winnigish.",
+        "rarity": "1",
+        "image": "[\"https://rutdiscord.github.io/halloween2023/final/bank/bankCommon.blend\"]",
+        "preview": "https://rutdiscord.github.io/halloween2023/final/bank/bankCommon.gif"
+    },
+    {
+        "id": 37,
+        "name": "Phillip Banks (Half-Price)",
+        "description": "The results of an illicit bank-making operation.",
+        "rarity": "2",
+        "image": "[\"https://rutdiscord.github.io/halloween2023/final/bank/bankRare.blend\"]",
+        "preview": "https://rutdiscord.github.io/halloween2023/final/bank/bankRare.gif"
+    },
+    {
+        "id": 38,
+        "name": "Phillip Banks (Specil)",
+        "description": "Some of those are banks...",
+        "rarity": "3",
+        "image": "[\"https://rutdiscord.github.io/halloween2023/final/bank/bankEpic.blend\"]",
+        "preview": "https://rutdiscord.github.io/halloween2023/final/bank/bankEpic.gif"
+    },
+    {
+        "id": 39,
+        "name": "Phillip Banks [BIG SHOT]",
+        "description": "Lemme tell you something about women. EfAFefAFefAF. ef*AF*efAFef*AF*. \\*Pat pat.\\*",
+        "rarity": "4",
+        "image": "[\"https://rutdiscord.github.io/halloween2023/final/bank/bankLegendary.blend\"]",
+        "preview": "https://rutdiscord.github.io/halloween2023/final/bank/bankLegendary.gif"
+    },
+    {
+        "id": 40,
+        "name": "Someone's Manual (Slimy)",
+        "description": "Smells like rainwater.",
+        "rarity": "1",
+        "image": "[\"https://rutdiscord.github.io/halloween2023/final/manual/manualCommon.blend\"]",
+        "preview": "https://rutdiscord.github.io/halloween2023/final/manual/manualCommon.gif"
+    },
+    {
+        "id": 41,
+        "name": "Someone's Manual (Half-Price)",
+        "description": "Printed with a pirate copy of Quark Express.",
+        "rarity": "2",
+        "image": "[\"https://rutdiscord.github.io/halloween2023/final/manual/manualRare.blend\"]",
+        "preview": "https://rutdiscord.github.io/halloween2023/final/manual/manualRare.gif"
+    },
+    {
+        "id": 42,
+        "name": "Someone's Manual (Specil)",
+        "description": "After the forum games had their chance, now it's your turn to write it!",
+        "rarity": "3",
+        "image": "[\"https://rutdiscord.github.io/halloween2023/final/manual/manualEpic.blend\"]",
+        "preview": "https://rutdiscord.github.io/halloween2023/final/manual/manualEpic.gif"
+    },
+    {
+        "id": 43,
+        "name": "Someone's Manual [BIG SHOT]",
+        "description": "H-Hey, hey you could've gilded the edges. Hey. HEY. YOU DIDN'T HAVE TO MAKE THE WHOLE THING GOLD. *HEY. GILDED EDGES ARE ALREADY A THING PEOPLE DO TO BOOKS. **HEY.***",
+        "rarity": "4",
+        "image": "[\"https://rutdiscord.github.io/halloween2023/final/manual/manualLegendary.blend\"]",
+        "preview": "https://rutdiscord.github.io/halloween2023/final/manual/manualLegendary.gif"
+    },
+    {
+        "id": 44,
+        "name": "Blookbusters Keychain (Slimy)",
+        "description": "Smells like keys. ***Click MP4 to hear!***",
+        "rarity": "1",
+        "image": "[\"https://rutdiscord.github.io/halloween2023/final/chain/chainCommon.mp4\",\"https://rutdiscord.github.io/halloween2023/final/chain/chainCommon.blend\"]",
+        "preview": "https://rutdiscord.github.io/halloween2023/final/chain/chainCommon.gif"
+    },
+    {
+        "id": 45,
+        "name": "Blookbusters Keychain (Half-Price)",
+        "description": "Impressive that audio still plays at this quality. ***Click MP4 to hear!***",
+        "rarity": "2",
+        "image": "[\"https://rutdiscord.github.io/halloween2023/final/chain/chainRare.mp4\",\"https://rutdiscord.github.io/halloween2023/final/chain/chainRare.blend\"]",
+        "preview": "https://rutdiscord.github.io/halloween2023/final/chain/chainRare.gif"
+    },
+    {
+        "id": 46,
+        "name": "Blookbusters Keychain (Specil)",
+        "description": "Aren't you NOT supposed to do that to Napstablook? ***Click MP4 to hear!***",
+        "rarity": "3",
+        "image": "[\"https://rutdiscord.github.io/halloween2023/final/chain/chainEpic.mp4\",\"https://rutdiscord.github.io/halloween2023/final/chain/chainEpic.blend\"]",
+        "preview": "https://rutdiscord.github.io/halloween2023/final/chain/chainEpic.gif"
+    },
+    {
+        "id": 47,
+        "name": "Blookbusters Keychain [BIG SHOT]",
+        "description": "Wait, that's not the audio we recorded... ***Click MP4 to hear!***",
+        "rarity": "4",
+        "image": "[\"https://rutdiscord.github.io/halloween2023/final/chain/chainLegendary.mp4\",\"https://rutdiscord.github.io/halloween2023/final/chain/chainLegendary.blend\"]",
+        "preview": "https://rutdiscord.github.io/halloween2023/final/chain/chainLegendary.gif"
+    },
+    {
+        "id": 48,
+        "name": "Snail Race Trophy",
+        "description": "They came, they saw, they slithered... and you made out like a bandit!",
+        "rarity": "4",
+        "image": "[\"https://rutdiscord.github.io/halloween2023/final/snail/snail.blend\"]",
+        "preview": "https://rutdiscord.github.io/halloween2023/final/snail/snail.gif"
     }
 ]
