@@ -27,16 +27,20 @@ def fmt_emojiboard(board: list[int]) -> str:
 
 class BingoSession:
     balls = 75
-    played_balls = [0]
-    boards: dict[disnake.Member, list[int]] = {}
-    timeouts: dict[disnake.Member, datetime.datetime] = {}
-    won = False
+    played_balls: list[int]
+    boards: dict[disnake.Member, list[int]]
+    timeouts: dict[disnake.Member, datetime.datetime]
+    won: bool
     buttonsalt: str
     game_message: disnake.Message
     game_embed: disnake.Embed
 
     def __init__(self):
         self.buttonsalt = ''.join(random.choices(string.ascii_letters, k=8))
+        self.boards = {}
+        self.timeouts = {}
+        self.played_balls = [0]
+        self.won = False
 
     def generate_board(self, player: disnake.Member) -> list:
         board = []
@@ -63,7 +67,7 @@ class BingoSession:
     async def generate_global_embed(self, channel: disnake.TextChannel) -> disnake.Message:
         start_time = datetime.datetime.now() + datetime.timedelta(seconds=game_delay)
         embed = disnake.Embed(title="Bingo", description="Welcome to Bingo!")
-        embed.set_footer(text="Bingo")
+        embed.set_footer(text=f"Bingo")
         embed.set_author(name="Bingo", icon_url="")
         embed.add_field(name="Current emoji",
                         value="We haven't started yet, go get a board!\n"
@@ -128,10 +132,10 @@ class BingoSession:
 
     def check_lockout(self, player: disnake.Member) -> bool:
         if player in self.timeouts:
-            if datetime.datetime.now() < self.timeouts[player.id]:
+            if datetime.datetime.now() < self.timeouts[player]:
                 return True
             else:
-                del self.timeouts[player.id]
+                del self.timeouts[player]
         return False
 
 
@@ -193,7 +197,7 @@ async def play_game(channel: disnake.TextChannel, bot: disnake.ext.commands.Bot,
                 db.award_tickets(1000, player, "Bingo")
             else:
                 await interaction.send("You didn't have a bingo! You've been prevented from calling \"Bingo\" for two minutes", ephemeral=True)
-                session.timeouts[player.id] = datetime.datetime.now(
+                session.timeouts[player] = datetime.datetime.now(
                 ) + datetime.timedelta(minutes=2)
 
     await asyncio.sleep(game_delay)
