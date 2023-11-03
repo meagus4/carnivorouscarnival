@@ -189,11 +189,14 @@ async def play_game(channel: disnake.TextChannel, bot: disnake.ext.commands.Bot,
 
         if button == "bingo":
             won, bingo_type = await session.check_bingo(typing.cast(disnake.Member, interaction.author))
+            if session.won == True:
+                return
             if won:
+                session.won = True
                 await channel.send(f"{player.mention} won the game by completing: \"{bingo_type}\"!")
                 session.game_embed.set_field_at(
                     0, name="Current emoji", value=f"The game has ended.{player.mention} won 1000 tickets.")
-                session.won = True
+                await session.game_message.edit(embed=session.game_embed)
                 db.award_tickets(1000, player, "Bingo")
             else:
                 await interaction.send("You didn't have a bingo! You've been prevented from calling \"Bingo\" for two minutes", ephemeral=True)
