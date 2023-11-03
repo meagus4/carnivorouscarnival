@@ -277,7 +277,7 @@ class GameStateManager:
                             rarity = 2
                         else:
                             rarity = 3
-                        prize, = db.award_random_prize(inter.author, "Shop", rarity)
+                        prize = db.award_random_prize(inter.author, "Shop", rarity)
                         prize_data = db.get_prize(prize)
                         await inter2.send(f"You have purchased a Loot Box!\nInside the loot box you find a **{prize_data[1]}**!\nYou can view your new prize with `/inv`", ephemeral=True)
                 else:
@@ -470,11 +470,7 @@ async def submit_session(session: str, game_name: str, score: str, reward: bool=
     """
     Submit a completed game using your session token. Games can be submitted *once*.
     """
-    # i don't know why we validate the token in this module for the
-    # function immediately above, but for submitting game results the validation
-    # is already baked into the DB validation method in the other module.
-    # 2 am programming, i guess.
-
+    
     valid, reason = db.submit_game_results(session, int(score))
 
     token = tokentools.decrypt_token(session)
@@ -503,7 +499,7 @@ async def submit_session(session: str, game_name: str, score: str, reward: bool=
             elif chance <= 18:
                 rarity = 2
 
-            prize, = db.award_random_prize(typing.cast(disnake.Member,user), game_name, rarity)
+            prize = db.award_random_prize(typing.cast(disnake.Member,user), game_name, rarity)
             prize_data = db.get_prize(prize)
             reward = prize_data[1]
     return responses.JSONResponse({"valid" : valid, "reason": reason,"tickets": tickets, "reward": reward}, status_code=200 if valid else 400)

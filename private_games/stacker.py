@@ -121,11 +121,11 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
         if random.randint(1,3) == 3:
             draw = random.randint(1, 10)
             if draw <= 2:
-                prize, = db.award_random_prize(member, "Stacker", 1)
+                prize = db.award_random_prize(member, "Stacker", 1)
             elif draw <= 7:
-                prize, = db.award_random_prize(member, "Stacker", 2)
+                prize = db.award_random_prize(member, "Stacker", 2)
             else:
-                prize, = db.award_random_prize(member, "Stacker", 3)
+                prize = db.award_random_prize(member, "Stacker", 3)
             prize_data = db.get_prize(prize)
             desc += f"\nWow! You won a {prize_data[1]}! You can view your prizes with `/inv`"
     elif current_row < 2:
