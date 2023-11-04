@@ -153,7 +153,7 @@ async def play_game(channel: disnake.TextChannel, bot: disnake.ext.commands.Bot,
 
     for u in winner.friends:
         db.award_tickets(tickets, u, "Snail Race")
-        if random.randint(1, 100) == 100 and len(winner.friends) > 3:
+        if random.randint(1, 100) >= 90:
             prizes_string += f"\n{u.name} has won a **GOLDEN SNAIL**!"
             db.award_prize(u, "Snail Race", 48)
 
