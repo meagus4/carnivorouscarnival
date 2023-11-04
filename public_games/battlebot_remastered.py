@@ -178,7 +178,7 @@ def getFlavour(monster):
         f'{monster} thinks you\'re just playing!',
         f'{monster} chose trick!',
         f'{monster} hurls garbage at you!',
-        f'{monster} comes back again!'
+        f'{monster} comes back again!',
         f'{monster} is out of ideas!'
     ]
 
@@ -335,6 +335,7 @@ async def play_game(channel, bot2, optional_argument=None):
 
     monster_HP_MAX = round(((len(old_userList)) * 400))
 
+
     if loss:
         monster_HP_MAX = int(monster_HP_MAX * 0.90)
     if monster_HP_MAX < 3400:
@@ -355,7 +356,8 @@ async def play_game(channel, bot2, optional_argument=None):
     if mname == 'Sans':
         monster_HP_MAX = 1
 
-    monster_HP_MAX = 250
+    if channel.id == 1147388785269669908:
+        monster_HP_MAX = 100
 
     monster_HP = monster_HP_MAX
     turnTime = 60
@@ -376,7 +378,7 @@ async def play_game(channel, bot2, optional_argument=None):
                               disabled=False))])
 
     @bot.listen("on_button_click")
-    async def on_button_click(interaction):
+    async def on_battle_press(interaction):
         global userList, hitpoints, action_to_process
 
         if interaction.component.custom_id != 'attack_enemy' and interaction.component.custom_id != 'heal_player' and interaction.component.custom_id != 'throw_candy':
@@ -505,7 +507,7 @@ async def play_game(channel, bot2, optional_argument=None):
                     t_dmg = t_dmg + hitpoints[t_attacked]
                     hitpoints[t_attacked] = 0
                 user = await bot.get_or_fetch_user(t_attacked)
-                attackstring = f'{attackstring}{await user.name} for {t_dmg} Damage!\n'
+                attackstring = f'{attackstring}{user.name} for {t_dmg} Damage!\n'
                 embed = await newEmbed(f"{mname} is taking their turn!", monster, f"...<t:{int(atk_time + 16 + atkcount)}:R>",
                                  monster_HP,
                                  monster_HP_MAX, actions=f"Turn ends...:", color=0xFFD800)
@@ -547,18 +549,18 @@ async def play_game(channel, bot2, optional_argument=None):
             if dmgDone[i] > tmpDMG and lastAttacker is not i:
                 tmpDMG = dmgDone[i]
                 tmpUSR = i
+        user2 = await bot.get_or_fetch_user(tmpUSR)
 
         if tmpUSR != 0:
             user = await bot.get_or_fetch_user(lastAttacker)
-            user2 = await bot.get_or_fetch_user(tmpUSR)
 
-            draw = random.randint(1, 10)
-            if draw <= 4:
-                prize, = db.award_random_prize(user2, "Battlebot", 1)
-            elif draw <= 9:
-                prize, = db.award_random_prize(user2, "Battlebot", 2)
+            draw = random.randint(1, 20)
+            if draw <= 11:
+                prize = db.award_random_prize(user2, "Battlebot", 1)
+            elif draw <= 19:
+                prize = db.award_random_prize(user2, "Battlebot", 2)
             else:
-                prize, = db.award_random_prize(user2, "Battlebot", 3)
+                prize = db.award_random_prize(user2, "Battlebot", 3)
             prize_data = db.get_prize(prize)
 
             vEmbed.add_field(name='Monster Defeated',
@@ -566,7 +568,7 @@ async def play_game(channel, bot2, optional_argument=None):
         else:
             user = await bot.get_or_fetch_user(lastAttacker)
             vEmbed.add_field(name='Monster Defeated',
-                             value=f'{await user.name} got the final hit! They have been awarded {reg_c} Tickets!',
+                             value=f'{user.name} got the final hit! They have been awarded {reg_c} Tickets!',
                              inline=False)
         loss = False
         addCandies(user, reg_c)
@@ -580,7 +582,7 @@ async def play_game(channel, bot2, optional_argument=None):
     await message.edit(embed=vEmbed)
 
     old_userList = hitpoints.items()
-
+    bot.remove_listener(on_battle_press)
 
 async def attack(action, player_hp):
     global dmgDone, lastAttacker
@@ -644,6 +646,7 @@ async def attack(action, player_hp):
         dmgDone[action.author.id] = attackDmg
     else:
         dmgDone[action.author.id] = dmgDone[action.author.id] + attackDmg
+    print(dmgDone)
 
     return attackDmg, player_hp
 

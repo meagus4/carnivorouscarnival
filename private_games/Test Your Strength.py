@@ -71,13 +71,13 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
             high_value = random.randint(0, 9)
             for i in range(3):
                 value, style = compare(count, medium_value, high_value)
-                row1.add_button(label="Hit Me!", style=style, custom_id=f"{uid}-{count}-{value}")
+                row1.add_button(label=f"+{value}", style=style, custom_id=f"{uid}-{count}-{value}")
                 count += 1
                 value, style = compare(count, medium_value, high_value)
-                row2.add_button(label="Hit Me!", style=style, custom_id=f"{uid}-{count}-{value}")
+                row2.add_button(label=f"+{value}", style=style, custom_id=f"{uid}-{count}-{value}")
                 count += 1
                 value, style = compare(count, medium_value, high_value)
-                row3.add_button(label="Hit Me!", style=style, custom_id=f"{uid}-{count}-{value}")
+                row3.add_button(label=f"+{value}", style=style, custom_id=f"{uid}-{count}-{value}")
                 count += 1
             components = [row1, row2, row3]
             await message.edit(embed=embed, components=components)
@@ -89,19 +89,19 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
                                   description=f"Hit as many buttons as possible in the time allotted to win!\nThe game starts in {0-time} Seconds.\n{newline.join(empty_bar)}")
         elif time == 0:
             for i in range(3):
-                row1.add_button(label="Hit Me!", style=disnake.ButtonStyle.primary, custom_id=f"{uid}-{count}-{value}")
+                row1.add_button(label="+1", style=disnake.ButtonStyle.primary, custom_id=f"{uid}-{count}-{value}")
                 count += 1
-                row2.add_button(label="Hit Me!", style=disnake.ButtonStyle.primary, custom_id=f"{uid}-{count}-{value}")
+                row2.add_button(label="+1", style=disnake.ButtonStyle.primary, custom_id=f"{uid}-{count}-{value}")
                 count += 1
-                row3.add_button(label="Hit Me!", style=disnake.ButtonStyle.primary, custom_id=f"{uid}-{count}-{value}")
+                row3.add_button(label="+1", style=disnake.ButtonStyle.primary, custom_id=f"{uid}-{count}-{value}")
                 count += 1
             components = [row1, row2, row3]
             strength_display = newline.join(empty_bar)
             embed = disnake.Embed(title="Test Your Strength!",
-                                  description=f"Hit as many buttons as possible in the time allotted to win!\nThe game ends in {10-time} Seconds.\n{strength_display}")
+                                  description=f"Score as much as possible in the time allotted to win!\nThe game ends in {10-time} Seconds.\n{strength_display}")
         else:
             embed = disnake.Embed(title="Test Your Strength!",
-                                  description=f"Hit as many buttons as possible in the time allotted to win!\nThe game ends in {10-time} Seconds.\n{strength_display}")
+                                  description=f"Score as much as possible in the time allotted to win!\nThe game ends in {10-time} Seconds.\n{strength_display}")
         await message.edit(embed=embed, components=components)
         await asyncio.sleep(1)
 

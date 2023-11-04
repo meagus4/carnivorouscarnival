@@ -56,8 +56,6 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
 
     while game_ongoing:
         while turn_active:
-            print(
-                f"row_position: {row_position}, row_direction: {row_direction}, width: {width}, current_row: {current_row}")
 
             if row_position > 6:
                 row_position = 6
@@ -75,7 +73,7 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
                         stacker_board[current_row][row_position + (i * row_direction)] = 1
                     row_position += row_direction
                 except IndexError as ex:
-                    print(f"{ex}")
+                    pass
 
             stacker_board_str = ""
             for row in stacker_board[:-1]:
@@ -123,11 +121,11 @@ async def play_game(thread: disnake.Thread, member: disnake.Member, bot: disnake
         if random.randint(1,3) == 3:
             draw = random.randint(1, 10)
             if draw <= 2:
-                prize, = db.award_random_prize(member, "Stacker", 1)
+                prize = db.award_random_prize(member, "Stacker", 1)
             elif draw <= 7:
-                prize, = db.award_random_prize(member, "Stacker", 2)
+                prize = db.award_random_prize(member, "Stacker", 2)
             else:
-                prize, = db.award_random_prize(member, "Stacker", 3)
+                prize = db.award_random_prize(member, "Stacker", 3)
             prize_data = db.get_prize(prize)
             desc += f"\nWow! You won a {prize_data[1]}! You can view your prizes with `/inv`"
     elif current_row < 2:

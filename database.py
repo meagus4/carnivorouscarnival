@@ -70,7 +70,7 @@ class Database:
         res = self.db.execute(
             "select prize from prize_wins where rowid = last_insert_rowid()")
         self.db.commit()
-        return res.fetchall()[0]
+        return res.fetchall()[0][0]
 
     def get_thread_for_user(self, user: disnake.Member) -> str:
         res = self.db.execute("select thread from threads where user=?",(user.id,)) or None
