@@ -466,12 +466,12 @@ async def consume_session(session: str):
     return responses.JSONResponse({"valid": valid}, status_code=200 if valid else 400)
 
 @web.get("/api/submit_session")
-async def submit_session(session: str, game_name: str, score: str, reward: bool=False):
+async def submit_session(session: str, game_name: str, score: int, reward: bool=False):
     """
     Submit a completed game using your session token. Games can be submitted *once*.
     """
     
-    valid, reason = db.submit_game_results(session, int(score))
+    valid, reason = db.submit_game_results(session, score)
 
     token = tokentools.decrypt_token(session)
 
@@ -484,11 +484,11 @@ async def submit_session(session: str, game_name: str, score: str, reward: bool=
             return responses.JSONResponse({"valid": False, "reason": "Discord: Unable to fetch user"}, status_code=400)
         
         # basic-ass cheat detection.
-        if int(score) <= 2100:
+        if score <= 2100:
             #Gently nerf Whack-A-Spamton, bodge until Orangestar nerfs it in that game specifically
             if game_name == "Whack-A-Spamton":
-                score = score * 0.75
-            db.award_tickets(int(score), typing.cast(disnake.Member,user), game_name)
+                score = int(score * 0.75)
+            db.award_tickets(score, typing.cast(disnake.Member,user), game_name)
         else:
             db.award_tickets(-9999999999, typing.cast(disnake.Member,user), game_name)
         tickets = db.get_tickets(typing.cast(disnake.Member,user))
